@@ -37,6 +37,11 @@ export default function NavBar() {
                 About us
               </Link>
             </li>
+            <li>
+              <Link activeProps={{ className: "font-bold" }} to="/articles">
+                Articles
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
