@@ -11,25 +11,26 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as SignupImport } from './routes/signup'
 import { Route as LoginImport } from './routes/login'
-import { Route as ArticlesImport } from './routes/articles'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
-import { Route as ArticlesActionImport } from './routes/articles.action'
-import { Route as ArticlesArticleIdImport } from './routes/articles.$articleId'
-import { Route as privateDashboardImport } from './routes/(private)/dashboard'
+import { Route as ArticlesIndexImport } from './routes/articles/index'
+import { Route as ProfileDashboardImport } from './routes/profile/dashboard'
+import { Route as ArticlesActionImport } from './routes/articles/action'
+import { Route as ArticlesArticleIdImport } from './routes/articles/$articleId'
 
 // Create/Update Routes
+
+const SignupRoute = SignupImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const LoginRoute = LoginImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const ArticlesRoute = ArticlesImport.update({
-  id: '/articles',
-  path: '/articles',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -45,21 +46,27 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const ArticlesIndexRoute = ArticlesIndexImport.update({
+  id: '/articles/',
+  path: '/articles/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProfileDashboardRoute = ProfileDashboardImport.update({
+  id: '/profile/dashboard',
+  path: '/profile/dashboard',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const ArticlesActionRoute = ArticlesActionImport.update({
-  id: '/action',
-  path: '/action',
-  getParentRoute: () => ArticlesRoute,
+  id: '/articles/action',
+  path: '/articles/action',
+  getParentRoute: () => rootRoute,
 } as any)
 
 const ArticlesArticleIdRoute = ArticlesArticleIdImport.update({
-  id: '/$articleId',
-  path: '/$articleId',
-  getParentRoute: () => ArticlesRoute,
-} as any)
-
-const privateDashboardRoute = privateDashboardImport.update({
-  id: '/(private)/dashboard',
-  path: '/dashboard',
+  id: '/articles/$articleId',
+  path: '/articles/$articleId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -81,13 +88,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutImport
       parentRoute: typeof rootRoute
     }
-    '/articles': {
-      id: '/articles'
-      path: '/articles'
-      fullPath: '/articles'
-      preLoaderRoute: typeof ArticlesImport
-      parentRoute: typeof rootRoute
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -95,75 +95,78 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginImport
       parentRoute: typeof rootRoute
     }
-    '/(private)/dashboard': {
-      id: '/(private)/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof privateDashboardImport
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupImport
       parentRoute: typeof rootRoute
     }
     '/articles/$articleId': {
       id: '/articles/$articleId'
-      path: '/$articleId'
+      path: '/articles/$articleId'
       fullPath: '/articles/$articleId'
       preLoaderRoute: typeof ArticlesArticleIdImport
-      parentRoute: typeof ArticlesImport
+      parentRoute: typeof rootRoute
     }
     '/articles/action': {
       id: '/articles/action'
-      path: '/action'
+      path: '/articles/action'
       fullPath: '/articles/action'
       preLoaderRoute: typeof ArticlesActionImport
-      parentRoute: typeof ArticlesImport
+      parentRoute: typeof rootRoute
+    }
+    '/profile/dashboard': {
+      id: '/profile/dashboard'
+      path: '/profile/dashboard'
+      fullPath: '/profile/dashboard'
+      preLoaderRoute: typeof ProfileDashboardImport
+      parentRoute: typeof rootRoute
+    }
+    '/articles/': {
+      id: '/articles/'
+      path: '/articles'
+      fullPath: '/articles'
+      preLoaderRoute: typeof ArticlesIndexImport
+      parentRoute: typeof rootRoute
     }
   }
 }
 
 // Create and export the route tree
 
-interface ArticlesRouteChildren {
-  ArticlesArticleIdRoute: typeof ArticlesArticleIdRoute
-  ArticlesActionRoute: typeof ArticlesActionRoute
-}
-
-const ArticlesRouteChildren: ArticlesRouteChildren = {
-  ArticlesArticleIdRoute: ArticlesArticleIdRoute,
-  ArticlesActionRoute: ArticlesActionRoute,
-}
-
-const ArticlesRouteWithChildren = ArticlesRoute._addFileChildren(
-  ArticlesRouteChildren,
-)
-
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/articles': typeof ArticlesRouteWithChildren
   '/login': typeof LoginRoute
-  '/dashboard': typeof privateDashboardRoute
+  '/signup': typeof SignupRoute
   '/articles/$articleId': typeof ArticlesArticleIdRoute
   '/articles/action': typeof ArticlesActionRoute
+  '/profile/dashboard': typeof ProfileDashboardRoute
+  '/articles': typeof ArticlesIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/articles': typeof ArticlesRouteWithChildren
   '/login': typeof LoginRoute
-  '/dashboard': typeof privateDashboardRoute
+  '/signup': typeof SignupRoute
   '/articles/$articleId': typeof ArticlesArticleIdRoute
   '/articles/action': typeof ArticlesActionRoute
+  '/profile/dashboard': typeof ProfileDashboardRoute
+  '/articles': typeof ArticlesIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/articles': typeof ArticlesRouteWithChildren
   '/login': typeof LoginRoute
-  '/(private)/dashboard': typeof privateDashboardRoute
+  '/signup': typeof SignupRoute
   '/articles/$articleId': typeof ArticlesArticleIdRoute
   '/articles/action': typeof ArticlesActionRoute
+  '/profile/dashboard': typeof ProfileDashboardRoute
+  '/articles/': typeof ArticlesIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -171,46 +174,55 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
-    | '/articles'
     | '/login'
-    | '/dashboard'
+    | '/signup'
     | '/articles/$articleId'
     | '/articles/action'
+    | '/profile/dashboard'
+    | '/articles'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
-    | '/articles'
     | '/login'
-    | '/dashboard'
+    | '/signup'
     | '/articles/$articleId'
     | '/articles/action'
+    | '/profile/dashboard'
+    | '/articles'
   id:
     | '__root__'
     | '/'
     | '/about'
-    | '/articles'
     | '/login'
-    | '/(private)/dashboard'
+    | '/signup'
     | '/articles/$articleId'
     | '/articles/action'
+    | '/profile/dashboard'
+    | '/articles/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  ArticlesRoute: typeof ArticlesRouteWithChildren
   LoginRoute: typeof LoginRoute
-  privateDashboardRoute: typeof privateDashboardRoute
+  SignupRoute: typeof SignupRoute
+  ArticlesArticleIdRoute: typeof ArticlesArticleIdRoute
+  ArticlesActionRoute: typeof ArticlesActionRoute
+  ProfileDashboardRoute: typeof ProfileDashboardRoute
+  ArticlesIndexRoute: typeof ArticlesIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  ArticlesRoute: ArticlesRouteWithChildren,
   LoginRoute: LoginRoute,
-  privateDashboardRoute: privateDashboardRoute,
+  SignupRoute: SignupRoute,
+  ArticlesArticleIdRoute: ArticlesArticleIdRoute,
+  ArticlesActionRoute: ArticlesActionRoute,
+  ProfileDashboardRoute: ProfileDashboardRoute,
+  ArticlesIndexRoute: ArticlesIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -225,9 +237,12 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/about",
-        "/articles",
         "/login",
-        "/(private)/dashboard"
+        "/signup",
+        "/articles/$articleId",
+        "/articles/action",
+        "/profile/dashboard",
+        "/articles/"
       ]
     },
     "/": {
@@ -236,26 +251,23 @@ export const routeTree = rootRoute
     "/about": {
       "filePath": "about.tsx"
     },
-    "/articles": {
-      "filePath": "articles.tsx",
-      "children": [
-        "/articles/$articleId",
-        "/articles/action"
-      ]
-    },
     "/login": {
       "filePath": "login.tsx"
     },
-    "/(private)/dashboard": {
-      "filePath": "(private)/dashboard.tsx"
+    "/signup": {
+      "filePath": "signup.tsx"
     },
     "/articles/$articleId": {
-      "filePath": "articles.$articleId.tsx",
-      "parent": "/articles"
+      "filePath": "articles/$articleId.tsx"
     },
     "/articles/action": {
-      "filePath": "articles.action.tsx",
-      "parent": "/articles"
+      "filePath": "articles/action.tsx"
+    },
+    "/profile/dashboard": {
+      "filePath": "profile/dashboard.tsx"
+    },
+    "/articles/": {
+      "filePath": "articles/index.tsx"
     }
   }
 }

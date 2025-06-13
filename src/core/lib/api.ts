@@ -6,7 +6,7 @@ import axios from "axios";
 export const api = axios.create({
   // The base URL of your API. This will be prepended to all request paths.
   // It's best to use an environment variable for this.
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api",
 
   // Default headers that will be sent with every request
   headers: {
