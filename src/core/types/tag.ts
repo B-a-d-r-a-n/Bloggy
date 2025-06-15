@@ -3,6 +3,6 @@
 export interface Tag {
   _id: string;
   name: string;
-  createdAt: string; // timestamps are on the model
-  updatedAt: string;
+  createdAt?: string; // timestamps are on the model
+  updatedAt?: string;
 }

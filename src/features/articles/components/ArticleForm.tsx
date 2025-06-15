@@ -1,21 +1,28 @@
-import React from "react";
-import { useForm, Controller } from "react-hook-form";
+import React, { useMemo } from "react";
+import { useForm, Controller, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  articleSchema,
-  articleEditSchema,
-  type ArticleFormValues,
-} from "../validation";
-import type { ArticleFull } from "../../../core/types/article"; // Assuming you have these types
+import { type ArticleFormValues, getArticleFormSchema } from "../validation";
+import type { ArticleFull } from "../../../core/types/article";
 import Input from "../../../components/ui/Input";
 import RichTextEditor from "./RichTextEditor";
+import Combobox from "../../../components/ui/combobox";
+import {
+  useCreateTag,
+  useGetCategories,
+  useGetTags,
+} from "../../shared/queries";
+import MultiSelectCombobox from "../../../components/ui/MultiSelectCombobox";
+import type { Tag } from "../../../core/types/tag";
 
 interface ArticleFormProps {
   mode: "create" | "edit";
-  initialData?: ArticleFull; // Provide initial data for edit mode
-  onSubmit: (data: FormData) => void; // We will submit as FormData
+  initialData?: ArticleFull;
+  onSubmit: (data: FormData) => void;
   isSubmitting: boolean;
 }
+
+// No need for a separate `FormInputValues` type anymore.
+// We'll use the one from our validation file.
 
 export default function ArticleForm({
   mode,
@@ -25,43 +32,82 @@ export default function ArticleForm({
 }: ArticleFormProps) {
   const isEditMode = mode === "edit";
 
+  const { data: categories = [], isLoading: isLoadingCategories } =
+    useGetCategories();
+
+  const { data: tagsData = [], isLoading: isLoadingTags } = useGetTags();
+
+  const createTagMutation = useCreateTag();
+
+  // --- THIS IS THE KEY FIX ---
+  // We create the schema inside the component based on the mode.
+  // `useMemo` ensures the schema is not recreated on every render unless `mode` changes.
+  const formSchema = useMemo(() => getArticleFormSchema(mode), [mode]);
+
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
   } = useForm<ArticleFormValues>({
-    resolver: zodResolver(isEditMode ? articleEditSchema : articleSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: isEditMode
       ? {
-          title: initialData?.title,
-          summary: initialData?.summary,
-          content: initialData?.content,
-          category: initialData?.category?._id,
-          tags: initialData?.tags?.map((t) => t._id),
+          title: initialData?.title || "",
+          summary: initialData?.summary || "",
+          content: initialData?.content || "",
+          category: initialData?.category?._id || "",
+          tags: initialData?.tags, // This is now correctly Tag[]
         }
-      : {},
+      : {
+          title: "",
+          summary: "",
+          content: "",
+          category: "",
+          tags: [],
+        },
   });
-
-  const handleFormSubmit = (data: ArticleFormValues) => {
-    // Convert the form data to FormData for file upload
+  console.log("React Hook Form Errors:", errors);
+  // The submit handler can be simplified. No need for `safeParse` anymore
+  // because the resolver handles the dynamic validation.
+  const handleFormSubmit: SubmitHandler<ArticleFormValues> = (data) => {
+    console.log("2. Form: handleFormSubmit called with RHF data:", data);
     const formData = new FormData();
 
-    // Use Object.entries to append all data
-    Object.entries(data).forEach(([key, value]) => {
-      if (key === "coverImage" && value) {
-        formData.append(key, value[0]); // Append the file
-      } else if (key === "tags" && Array.isArray(value)) {
-        // Your backend expects tags as a JSON string with multipart/form-data
-        formData.append(key, JSON.stringify(value));
-      } else if (value) {
-        formData.append(key, value);
+    // This logic is now cleaner as well
+    const { tags, ...restOfData } = data;
+
+    if (tags) {
+      const tagIds = tags.map((tag) => tag._id);
+      formData.append("tags", JSON.stringify(tagIds));
+    }
+
+    Object.entries(restOfData).forEach(([key, value]) => {
+      if (key === "coverImage" && value && (value as FileList).length > 0) {
+        formData.append(key, (value as FileList)[0]);
+      } else if (value && key !== "coverImage") {
+        // Exclude empty coverImage
+        formData.append(key, value as string);
       }
     });
 
     onSubmit(formData);
   };
 
+  const handleCreateTag = async (tagName: string): Promise<Tag | null> => {
+    try {
+      const response = await createTagMutation.mutateAsync(tagName);
+      return response.data; // Return the new tag object
+    } catch (error: any) {
+      // Handle case where tag already exists, or other errors
+      console.error("Failed to create tag:", error);
+      // You could use a toast notification library here to show the error
+      alert(
+        `Error: ${error.response?.data?.message || "Could not create tag"}`
+      );
+      return null;
+    }
+  };
   return (
     <form
       onSubmit={handleSubmit(handleFormSubmit)}
@@ -95,21 +141,64 @@ export default function ArticleForm({
         )}
       </div>
 
-      {/* TODO: Replace with dynamic Category and Tag select components */}
-      <Input
-        label="Category ID"
-        name="category"
-        register={register}
-        error={errors.category?.message}
-        disabled={isSubmitting}
-      />
-      <Input
-        label="Tag IDs (comma separated)"
-        name="tags"
-        register={register}
-        error={errors.tags?.message}
-        disabled={isSubmitting}
-      />
+      {/* --- CATEGORY COMBOBOX --- */}
+      <div>
+        <label className="label">
+          <span className="label-text">Category</span>
+        </label>
+        <Controller
+          name="category"
+          control={control}
+          render={({ field }) => (
+            <Combobox
+              placeholder={
+                isLoadingCategories ? "Loading..." : "Select a category..."
+              }
+              options={categories}
+              value={categories.find((c) => c._id === field.value) || null}
+              onChange={(option) => field.onChange(option?._id || "")}
+            />
+          )}
+        />
+        {errors.category && (
+          <span className="text-error text-xs mt-1">
+            {errors.category.message}
+          </span>
+        )}
+      </div>
+      {/* --- TAGS MULTI-SELECT COMBOBOX --- */}
+      <div>
+        <label className="label">
+          <span className="label-text">Tags</span>
+        </label>
+        <Controller
+          name="tags"
+          control={control}
+          render={({ field }) => (
+            <MultiSelectCombobox
+              // Use the renamed variable for the options
+              options={tagsData}
+              // --- FIX 2: THE TYPES NOW MATCH ---
+              // `field.value` is `Tag[] | undefined`
+              // `selected` prop expects `Tag[]`
+              // The `|| []` handles the undefined case.
+              selected={field.value || []}
+              onChange={field.onChange}
+              placeholder={
+                isLoadingTags ? "Loading tags..." : "Search or create a tag..."
+              }
+              onCreate={handleCreateTag}
+              isCreating={createTagMutation.isPending}
+            />
+          )}
+        />
+        {/* Added a more type-safe way to access the error message */}
+        {errors.tags && (
+          <span className="text-error text-xs mt-1">{errors.tags.message}</span>
+        )}
+      </div>
+
+      {/* ... rest of the form ... */}
 
       <div>
         <label className="label">
@@ -136,7 +225,7 @@ export default function ArticleForm({
           control={control}
           defaultValue={initialData?.content || ""}
           render={({ field }) => (
-            <RichTextEditor content={field.value} onChange={field.onChange} />
+            <RichTextEditor content={field.value!} onChange={field.onChange} />
           )}
         />
         {errors.content && (

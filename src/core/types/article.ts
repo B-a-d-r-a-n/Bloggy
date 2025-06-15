@@ -31,6 +31,7 @@ export interface ArticleListItem {
  * Includes full content and deeply populated relational data.
  */
 export interface ArticleFull {
+  id: string;
   _id: string;
   title: string;
   summary: string;

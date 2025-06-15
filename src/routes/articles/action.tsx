@@ -1,3 +1,4 @@
+import React, { useState } from "react"; // Import React for useState
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import ArticleForm from "../../features/articles/components/ArticleForm";
@@ -5,14 +6,11 @@ import {
   useGetArticleById,
   useCreateArticle,
   useUpdateArticle,
-  articleKeys,
 } from "../../features/articles/queries";
-import articleService from "../../core/services/articleService"; // Make sure path is correct
 
-// Define search params validation using Zod
 const articleActionSearchSchema = z
   .object({
-    mode: z.enum(["create", "edit"]),
+    mode: z.enum(["create", "edit"]).default("create"),
     articleId: z.string().optional(),
   })
   .refine((data) => (data.mode === "edit" ? !!data.articleId : true), {
@@ -20,72 +18,122 @@ const articleActionSearchSchema = z
   });
 
 export const Route = createFileRoute("/articles/action")({
-  // This step is still good. It validates the search params on arrival.
   validateSearch: (search) => articleActionSearchSchema.parse(search),
-
-  // Handle loading state for edit mode
-  loader: ({ context, search }) => {
-    // --- THIS IS THE FIX ---
-    // We re-parse the search object using our schema.
-    // This provides TypeScript with the correct types for `mode` and `articleId`.
-    const { mode, articleId } = articleActionSearchSchema.parse(search);
-
-    if (mode === "edit") {
-      // TypeScript now knows that if mode is 'edit', articleId MUST be a string
-      // because of our .refine() logic in the schema.
-      return context.queryClient.ensureQueryData({
-        queryKey: articleKeys.detail(articleId!), // Use the key factory
-        queryFn: () => articleService.fetchArticleById(articleId!),
-      });
-    }
-    // It's good practice to return something, even if null, from a loader.
-    return null;
-  },
-
   component: ArticleActionPage,
 });
 
 function ArticleActionPage() {
   const navigate = useNavigate();
-  // The `useSearch` hook will have the correctly typed search params
-  // because `validateSearch` has already run and parsed them.
   const { mode, articleId } = Route.useSearch();
 
-  // Get the pre-fetched data using `useLoaderData` for edit mode
-  const initialData = Route.useLoaderData();
+  // 1. State for handling API errors from mutations
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  // The type of `articleId` is narrowed to `string` inside this block
+  const isEditMode = mode === "edit" && !!articleId;
+
+  const {
+    data: initialData,
+    isLoading: isLoadingArticle,
+    isError: isArticleError,
+  } = useGetArticleById(
+    articleId!, // We can pass articleId directly
+    { enabled: isEditMode } // `enabled` handles the undefined/null case safely
+  );
 
   const createMutation = useCreateArticle();
   const updateMutation = useUpdateArticle();
 
   const handleSubmit = (formData: FormData) => {
-    if (mode === "edit" && articleId) {
+    setApiError(null); // Clear previous errors on a new submission
+
+    if (isEditMode) {
       updateMutation.mutate(
         { articleId, formData },
         {
-          onSuccess: (data) =>
+          onSuccess: (data) => {
+            // 2. Robust redirect logic
+            const id = data.id || data._id; // Prioritize virtual `id`, fall back to `_id`
             navigate({
               to: "/articles/$articleId",
-              params: { articleId: data._id },
-            }),
+              params: { articleId: id },
+              replace: true,
+            });
+          },
+          // 3. Handle errors from the mutation
+          onError: (error) => {
+            setApiError(error.message || "Failed to update the article.");
+          },
         }
       );
     } else {
       createMutation.mutate(formData, {
-        onSuccess: (data) =>
+        onSuccess: (data) => {
+          // 2. Robust redirect logic
+          const id = data.id || data._id;
           navigate({
             to: "/articles/$articleId",
-            params: { articleId: data._id },
-          }),
+            params: { articleId: id },
+            replace: true,
+          });
+        },
+        // 3. Handle errors from the mutation
+        onError: (error) => {
+          setApiError(error.message || "Failed to publish the article.");
+        },
       });
     }
   };
 
+  // 4. Refined loading and error handling for EDIT mode
+  if (isEditMode) {
+    if (isLoadingArticle) {
+      return (
+        <div className="py-12 text-center">
+          <span className="loading loading-lg loading-spinner"></span>
+          <p>Loading article for editing...</p>
+        </div>
+      );
+    }
+
+    if (isArticleError || !initialData) {
+      return (
+        <div className="py-12">
+          <div role="alert" className="alert alert-error max-w-2xl mx-auto">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="stroke-current shrink-0 h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span>
+              Error! Could not load article data. Please check the URL and try
+              again.
+            </span>
+          </div>
+        </div>
+      );
+    }
+  }
+
   return (
     <div className="py-12">
+      {/* 5. Display the API error message right above the form */}
+      {apiError && (
+        <div role="alert" className="alert alert-error max-w-4xl mx-auto mb-6">
+          <span>{apiError}</span>
+        </div>
+      )}
       <ArticleForm
         mode={mode}
-        // The type of `initialData` will be correctly inferred from the loader's return type.
-        initialData={mode === "edit" ? initialData : undefined}
+        initialData={initialData}
         onSubmit={handleSubmit}
         isSubmitting={createMutation.isPending || updateMutation.isPending}
       />

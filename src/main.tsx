@@ -19,7 +19,8 @@ const router = createRouter({
     auth: {
       isAuthenticated: authUtils.isAuthenticated,
     },
-  } satisfies RouterContext, // Use `satisfies` for type checking
+  } satisfies RouterContext,
+  defaultPreload: "intent", // Use `satisfies` for type checking
 });
 declare module "@tanstack/react-router" {
   interface Register {

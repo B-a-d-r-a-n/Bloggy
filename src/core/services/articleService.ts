@@ -1,15 +1,12 @@
 import { api } from "../../lib/api";
 import type { PaginatedArticlesResponse } from "../types/api";
-import type {
-  ArticleFull,
-  CreateArticlePayload,
-  UpdateArticlePayload,
-} from "../types/article";
+import type { ArticleFull } from "../types/article";
 
 class ArticleService {
-  async fetchArticles(): Promise<PaginatedArticlesResponse> {
-    const response =
-      await api.get<PaginatedArticlesResponse>("/api/v1/articles");
+  async fetchArticles(page: number = 1): Promise<PaginatedArticlesResponse> {
+    const response = await api.get<PaginatedArticlesResponse>(
+      `/api/v1/articles?page=${page}&limit=10`
+    );
 
     return response.data;
   }
@@ -40,6 +37,12 @@ class ArticleService {
     const response = await api.patch<ArticleFull>(
       `/api/v1/articles/${articleId}`,
       formData
+    );
+    return response.data;
+  }
+  async deleteArticle(articleId: string): Promise<ArticleFull> {
+    const response = await api.delete<ArticleFull>(
+      `/api/v1/articles/${articleId}`
     );
     return response.data;
   }

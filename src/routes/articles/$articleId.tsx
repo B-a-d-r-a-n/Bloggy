@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useGetArticleById } from "../../features/articles/queries"; // Adjust path
 import ArticleDetailDisplay from "../../features/articles/components/ArticleDetailDisplay"; // Adjust path
+import CommentSection from "../../features/comments/components/commentSection";
 // Import your comment section when it's ready
 // import CommentSection from '../../features/comments/components/CommentSection';
 
@@ -61,7 +62,7 @@ function ArticleDetailPage() {
 
       {/* You can add the Comment Section component right below it */}
       <div className="max-w-4xl mx-auto mt-16">
-        {/* <CommentSection articleId={article._id} /> */}
+        <CommentSection articleId={article!._id} />
       </div>
     </div>
   );

@@ -1,15 +1,21 @@
 // src/features/articles/queries.ts
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 // Import the singleton instance of your service
 // Import the types you'll be working with
 import articleService from "../../core/services/articleService";
 import type { PaginatedArticlesResponse } from "../../core/types/api";
 import type {
   ArticleFull,
-  CreateArticlePayload,
-  UpdateArticlePayload,
+  // CreateArticlePayload,
+  // UpdateArticlePayload,
 } from "../../core/types/article";
+import { useNavigate } from "@tanstack/react-router";
 
 /**
  * A "key factory" is a best practice for managing query keys.
@@ -40,55 +46,64 @@ export const articleKeys = {
 /**
  * This is the custom hook your components will use to get the list of articles.
  */
-export const useGetArticles = () => {
-  return useQuery<PaginatedArticlesResponse, Error>({
-    // queryKey: A unique, serializable key for this query.
-    // TanStack Query uses this for caching. We use our key factory.
-    queryKey: articleKeys.allLists(),
-
-    // queryFn: The function that returns a promise to fetch the data.
-    // We simply point it to our service method.
-    // TanStack Query will automatically call this function.
-    queryFn: articleService.fetchArticles,
-
-    // Optional: Configure caching behavior
-    // staleTime: 1000 * 60 * 5, // Data is considered fresh for 5 minutes
+/**
+ * Hook to fetch paginated articles for an infinite scroll list.
+ */
+export const useInfiniteArticles = () => {
+  return useInfiniteQuery({
+    queryKey: articleKeys.allLists(), // Use the main list key
+    // The query function receives the pageParam from getNextPageParam
+    queryFn: ({ pageParam }) => articleService.fetchArticles(pageParam),
+    // Start with page 1
+    initialPageParam: 1,
+    // Determine the next page number to fetch
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.pagination.hasNextPage
+        ? lastPage.pagination.currentPage + 1
+        : undefined; // Return undefined when there are no more pages
+    },
   });
 };
-export const useGetArticleById = (articleId: string) => {
+export const useGetArticleById = (
+  articleId: string,
+  options?: { enabled?: boolean }
+) => {
   return useQuery<ArticleFull, Error>({
     queryKey: articleKeys.detail(articleId),
     queryFn: () => articleService.fetchArticleById(articleId), // Assumes this service exists
-    enabled: !!articleId, // Only run if articleId is a valid string
+    ...options,
   });
 };
 /**
  * A mutation hook for CREATING a new article.
+ * It now handles the success redirect internally.
  */
 export const useCreateArticle = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   return useMutation({
-    // mutationFn is the function that will be called to perform the mutation.
-    // It receives the variables you pass to `mutate()`.
-    mutationFn: (formData: FormData) =>
+    // The mutation function now correctly expects a single ArticleFull object
+    mutationFn: (formData: FormData): Promise<ArticleFull> =>
       articleService.createNewArticle(formData),
 
-    // onSuccess is a callback that runs after a successful mutation.
-    // It's the perfect place to invalidate cached data.
-    onSuccess: (data) => {
-      console.log("Article created successfully:", data);
+    onSuccess: (newArticle) => {
+      // `newArticle` is now the direct object
+      console.log("Article created, received data:", newArticle);
 
-      // Invalidate the list of articles so it will be refetched with the new article.
-      // This will make your main article list update automatically!
+      // Invalidate queries as before
       queryClient.invalidateQueries({ queryKey: articleKeys.allLists() });
+      queryClient.setQueryData(articleKeys.detail(newArticle._id), newArticle);
 
-      // You can also pre-populate the cache for the new article's detail view.
-      queryClient.setQueryData(articleKeys.detail(data._id), data);
+      // The redirect logic now works perfectly with `newArticle._id`
+      navigate({
+        to: "/articles/$articleId",
+        params: { articleId: newArticle._id },
+        replace: true,
+      });
     },
 
     onError: (error: Error) => {
-      // You can handle global error logging here if you want.
       console.error("Error creating article:", error);
     },
   });
@@ -99,21 +114,61 @@ export const useCreateArticle = () => {
  */
 export const useUpdateArticle = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   return useMutation({
-    // The mutation function now needs both the ID and the data.
     mutationFn: (variables: { articleId: string; formData: FormData }) =>
       articleService.editExistingArticle(
         variables.articleId,
         variables.formData
       ),
 
-    onSuccess: (data) => {
-      console.log("Article updated successfully:", data);
+    onSuccess: (updatedArticle) => {
+      console.log("Article updated successfully:", updatedArticle);
 
-      // Invalidate both the list of articles and the specific article detail query.
+      // Invalidate to refetch fresh data
       queryClient.invalidateQueries({ queryKey: articleKeys.allLists() });
-      queryClient.invalidateQueries({ queryKey: articleKeys.detail(data._id) });
+      // Setting the data is better than invalidating here, it feels faster
+      queryClient.setQueryData(
+        articleKeys.detail(updatedArticle._id),
+        updatedArticle
+      );
+
+      // Navigate to the updated article page
+      navigate({
+        to: "/articles/$articleId",
+        params: { articleId: updatedArticle._id },
+        replace: true, // Replace the form page in history
+      });
+    },
+  });
+};
+
+export const useDeleteArticle = () => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  return useMutation({
+    // The mutation function will receive the article ID to delete.
+    mutationFn: (articleId: string) => articleService.deleteArticle(articleId),
+
+    onSuccess: (_, articleId) => {
+      // The first arg is the response (void), the second is the variable passed to mutate
+      console.log(`Article ${articleId} deleted successfully.`);
+
+      // Invalidate all article lists so the deleted article is removed.
+      queryClient.invalidateQueries({ queryKey: articleKeys.allLists() });
+
+      // Optional: Remove the specific article from the cache immediately.
+      queryClient.removeQueries({ queryKey: articleKeys.detail(articleId) });
+
+      // Navigate the user away from the now-deleted article page, perhaps to the main list.
+      navigate({ to: "/articles" });
+    },
+    onError: (error: Error) => {
+      console.error("Failed to delete article:", error);
+      // You can use a toast notification library to show this error to the user.
+      alert(`Error: ${error.message}`);
     },
   });
 };

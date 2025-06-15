@@ -1,36 +1,29 @@
-// src/types/comment.ts
+// src/core/types/comment.ts
 import type { User } from "./user";
+import type { PaginationInfo } from "./api";
 
-/**
- * Represents a fully populated comment, including its author and any nested,
- * populated replies. This is the primary type you'll work with on the frontend.
- */
 export interface PopulatedComment {
   _id: string;
   text: string;
-  // The service layer populates author with specific fields
   author: Pick<User, "_id" | "name" | "avatarUrl">;
-  article: string; // The ID of the parent article
-  replies?: PopulatedComment[]; // Replies are also PopulatedComment, creating a recursive structure
+  article: string;
+  replies?: PopulatedComment[];
   createdAt: string;
   updatedAt: string;
-  isOwner?: boolean; // This is a helper property the frontend can add after checking against the logged-in user's ID
+  isOwner?: boolean; // A frontend-only property
 }
 
-/**
- * Type for the API response when creating/updating a comment.
- */
-export interface CommentMutationResponse {
-  status: "success";
+// For the paginated GET request
+export interface PaginatedCommentsResponse {
+  pagination: PaginationInfo;
+  data: PopulatedComment[];
+}
+
+// For POSTing a new comment or reply
+export interface AddCommentResponse {
+  status: string;
   data: {
-    comment?: PopulatedComment; // For top-level comments or updates
-    reply?: PopulatedComment; // For replies
+    comment?: PopulatedComment;
+    reply?: PopulatedComment;
   };
-}
-
-/**
- * The data payload required to create a new comment or reply.
- */
-export interface CreateCommentPayload {
-  text: string;
 }

@@ -10,8 +10,9 @@ interface ArticleCardProps {
 
 export default function ArticleCard({ article }: ArticleCardProps) {
   const { user: currentUser } = useAuth();
+  const VITE_API_URL = import.meta.env.VITE_API_URL;
   return (
-    <div className="card w-full max-w-2xl bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 group">
+    <div className="card w-full max-w-2xl bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 group ">
       <Link
         to="/articles/$articleId"
         params={{ articleId: article._id }}
@@ -19,7 +20,11 @@ export default function ArticleCard({ article }: ArticleCardProps) {
       >
         <figure className="h-56 overflow-hidden">
           <img
-            src={article.coverImageUrl || "/default-cover.jpg"}
+            src={
+              article.coverImageUrl
+                ? `${VITE_API_URL}/${article.coverImageUrl}`
+                : "/default-cover.jpg"
+            }
             alt={`Cover image for ${article.title}`}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
@@ -33,11 +38,11 @@ export default function ArticleCard({ article }: ArticleCardProps) {
           </div>
         )}
 
-        <h2 className="card-title text-2xl lg:text-3xl font-bold !justify-start">
+        <h2 className="card-title text-2xl lg:text-3xl font-bold !justify-start ">
           <Link
             to="/articles/$articleId"
             params={{ articleId: article._id }}
-            className="link link-hover"
+            className="link link-hover break-all"
           >
             {article.title}
           </Link>
@@ -61,7 +66,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
           <span>{article.readTimeInMinutes} min read</span>
         </div>
 
-        <p className="text-base-content/90 leading-relaxed mt-2">
+        <p className="text-base-content/90 leading-relaxed mt-2 break-words">
           {article.summary}
         </p>
 
@@ -76,10 +81,9 @@ export default function ArticleCard({ article }: ArticleCardProps) {
 
           {/* ArticleActions is now self-contained, using the article data from this component */}
           <ArticleActions
+            articleId={article._id}
             author={article.author}
             currentUser={currentUser}
-            onDelete={() => console.log("Deleting", article._id)}
-            onEdit={() => console.log("Editing", article._id)}
           />
         </div>
       </div>

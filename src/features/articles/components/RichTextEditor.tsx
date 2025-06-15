@@ -1,106 +1,130 @@
 import React from "react";
-import {
-  useEditor,
-  EditorContent,
-  //   FloatingMenu,
-  //   BubbleMenu,
-} from "@tiptap/react";
+import { useEditor, EditorContent, type Editor } from "@tiptap/react"; // <-- Import the Editor type
 import StarterKit from "@tiptap/starter-kit";
 import {
-  Bold,
-  Italic,
-  Strikethrough,
-  //   Code,
-  Heading1,
-  Heading2,
-  List,
-  ListOrdered,
-  Quote,
-  Minus,
-} from "lucide-react"; // A great icon library: npm install lucide-react
+  ChatBubbleLeftRightIcon,
+  ListBulletIcon,
+  MinusIcon,
+  Bars3BottomLeftIcon,
+} from "@heroicons/react/24/outline"; // <-- Import from Heroicons
 
+// --- PROPS INTERFACES ---
 interface RichTextEditorProps {
   content: string;
   onChange: (richText: string) => void;
   className?: string;
 }
 
-// Toolbar component for the editor
-const EditorToolbar = ({ editor }: { editor: any }) => {
+interface EditorToolbarProps {
+  editor: Editor | null; // <-- Use the official Editor type
+}
+
+interface ToolbarButtonProps {
+  onClick: () => void;
+  isActive: boolean;
+  children: React.ReactNode;
+  ariaLabel: string;
+}
+
+// --- REUSABLE COMPONENTS ---
+
+// 1. Reusable Button Component to reduce repetition
+const ToolbarButton = ({
+  onClick,
+  isActive,
+  children,
+  ariaLabel,
+}: ToolbarButtonProps) => (
+  <button
+    type="button"
+    onClick={onClick}
+    aria-label={ariaLabel}
+    className={`btn btn-sm btn-ghost ${isActive ? "btn-active" : ""}`}
+  >
+    {children}
+  </button>
+);
+
+// 2. Toolbar component for the editor
+const EditorToolbar = ({ editor }: EditorToolbarProps) => {
   if (!editor) return null;
 
   return (
     <div className="flex flex-wrap items-center gap-1 border border-base-300 bg-base-200 p-2 rounded-t-lg">
-      <button
-        type="button"
+      <ToolbarButton
         onClick={() => editor.chain().focus().toggleBold().run()}
-        className={`btn btn-sm btn-ghost ${editor.isActive("bold") ? "btn-active" : ""}`}
+        isActive={editor.isActive("bold")}
+        ariaLabel="Bold"
       >
-        <Bold size={16} />
-      </button>
-      <button
-        type="button"
+        <span className="font-bold">B</span>
+      </ToolbarButton>
+      <ToolbarButton
         onClick={() => editor.chain().focus().toggleItalic().run()}
-        className={`btn btn-sm btn-ghost ${editor.isActive("italic") ? "btn-active" : ""}`}
+        isActive={editor.isActive("italic")}
+        ariaLabel="Italic"
       >
-        <Italic size={16} />
-      </button>
-      <button
-        type="button"
+        <span className="italic">I</span>
+      </ToolbarButton>
+      <ToolbarButton
         onClick={() => editor.chain().focus().toggleStrike().run()}
-        className={`btn btn-sm btn-ghost ${editor.isActive("strike") ? "btn-active" : ""}`}
+        isActive={editor.isActive("strike")}
+        ariaLabel="Strikethrough"
       >
-        <Strikethrough size={16} />
-      </button>
+        <span className="line-through">S</span>
+      </ToolbarButton>
+
       <div className="divider divider-horizontal mx-1"></div>
-      <button
-        type="button"
+
+      <ToolbarButton
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-        className={`btn btn-sm btn-ghost ${editor.isActive("heading", { level: 1 }) ? "btn-active" : ""}`}
+        isActive={editor.isActive("heading", { level: 1 })}
+        ariaLabel="Heading 1"
       >
-        <Heading1 size={16} />
-      </button>
-      <button
-        type="button"
+        <span className="font-bold">H1</span>
+      </ToolbarButton>
+      <ToolbarButton
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        className={`btn btn-sm btn-ghost ${editor.isActive("heading", { level: 2 }) ? "btn-active" : ""}`}
+        isActive={editor.isActive("heading", { level: 2 })}
+        ariaLabel="Heading 2"
       >
-        <Heading2 size={16} />
-      </button>
+        <span className="font-bold">H2</span>
+      </ToolbarButton>
+
       <div className="divider divider-horizontal mx-1"></div>
-      <button
-        type="button"
+
+      <ToolbarButton
         onClick={() => editor.chain().focus().toggleBulletList().run()}
-        className={`btn btn-sm btn-ghost ${editor.isActive("bulletList") ? "btn-active" : ""}`}
+        isActive={editor.isActive("bulletList")}
+        ariaLabel="Bullet List"
       >
-        <List size={16} />
-      </button>
-      <button
-        type="button"
+        <ListBulletIcon className="h-5 w-5" />
+      </ToolbarButton>
+      <ToolbarButton
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        className={`btn btn-sm btn-ghost ${editor.isActive("orderedList") ? "btn-active" : ""}`}
+        isActive={editor.isActive("orderedList")}
+        ariaLabel="Numbered List"
       >
-        <ListOrdered size={16} />
-      </button>
-      <button
-        type="button"
+        <Bars3BottomLeftIcon className="h-5 w-5" />
+      </ToolbarButton>
+      <ToolbarButton
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
-        className={`btn btn-sm btn-ghost ${editor.isActive("blockquote") ? "btn-active" : ""}`}
+        isActive={editor.isActive("blockquote")}
+        ariaLabel="Blockquote"
       >
-        <Quote size={16} />
-      </button>
-      <button
-        type="button"
+        <ChatBubbleLeftRightIcon className="h-5 w-5" />
+      </ToolbarButton>
+      <ToolbarButton
         onClick={() => editor.chain().focus().setHorizontalRule().run()}
-        className="btn btn-sm btn-ghost"
+        isActive={false}
+        ariaLabel="Horizontal Rule"
       >
-        <Minus size={16} />
-      </button>
+        <MinusIcon className="h-5 w-5" />
+      </ToolbarButton>
     </div>
   );
 };
 
-// Main Editor Component
+// 3. Main Editor Component
 export default function RichTextEditor({
   content,
   onChange,
@@ -109,7 +133,9 @@ export default function RichTextEditor({
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        // You can configure the starter kit here if needed
+        // Disable extensions you don't have a button for, like 'code'
+        code: false,
+        codeBlock: false,
       }),
     ],
     content: content,
@@ -118,7 +144,8 @@ export default function RichTextEditor({
     },
     editorProps: {
       attributes: {
-        class: `prose max-w-none p-4 min-h-[300px] border border-base-300 rounded-b-lg focus:outline-none focus:border-primary ${className}`,
+        // Use prose-pre:bg-base-300 etc. to style code blocks if you re-enable them
+        class: `prose max-w-none p-4 min-h-[300px] border-x border-b border-base-300 rounded-b-lg focus:outline-none ${className}`,
       },
     },
   });

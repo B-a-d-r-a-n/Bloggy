@@ -7,34 +7,99 @@ const ACCEPTED_IMAGE_TYPES = [
   "image/png",
   "image/webp",
 ];
-
-export const articleSchema = z.object({
-  title: z.string().min(5, "Title must be at least 5 characters long."),
-  summary: z
-    .string()
-    .min(20, "Summary must be at least 20 characters long.")
-    .max(300, "Summary cannot exceed 300 characters."),
-  category: z.string().min(1, "Please select a category."), // Assuming you'll send the category ID
-  tags: z.array(z.string()).min(1, "Please select at least one tag."),
-  content: z
-    .string()
-    .min(100, "Article content must be at least 100 characters long."),
-  coverImage: z
-    .any()
-    .refine((files) => files?.length >= 1, "Cover image is required.")
-    .refine(
-      (files) => files?.[0]?.size <= MAX_FILE_SIZE,
-      `Max file size is 5MB.`
-    )
-    .refine(
-      (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
-      ".jpg, .jpeg, .png and .webp files are accepted."
-    ),
+const tagSchema = z.object({
+  _id: z.string(),
+  name: z.string(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+});
+// This is the base shape of our form data, with everything optional.
+const baseArticleFormSchema = z.object({
+  title: z.string().optional(),
+  summary: z.string().optional(),
+  content: z.string().optional(),
+  category: z.string().optional(),
+  tags: z.array(tagSchema).optional(),
+  coverImage: z.any().optional(),
 });
 
-// For edit mode, all fields are optional, and the cover image is not required
-export const articleEditSchema = articleSchema.partial().extend({
-  coverImage: articleSchema.shape.coverImage.optional(),
-});
+// Create a TypeScript type from this base schema
+export type ArticleFormValues = z.infer<typeof baseArticleFormSchema>;
 
-export type ArticleFormValues = z.infer<typeof articleSchema>;
+// This is our new, unified schema that we will pass to the form.
+export const getArticleFormSchema = (mode: "create" | "edit") => {
+  return baseArticleFormSchema.superRefine((data, ctx) => {
+    // --- Validation rules for CREATE mode ---
+    if (mode === "create") {
+      if (!data.title || data.title.length < 5) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Title must be at least 5 characters.",
+          path: ["title"],
+        });
+      }
+      if (!data.summary || data.summary.length < 20) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Summary must be at least 20 characters.",
+          path: ["summary"],
+        });
+      }
+      if (!data.category) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Please select a category.",
+          path: ["category"],
+        });
+      }
+      if (!data.tags || data.tags.length < 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Please select at least one tag.",
+          path: ["tags"],
+        });
+      }
+      if (!data.content || data.content.length < 100) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Content must be at least 100 characters.",
+          path: ["content"],
+        });
+      }
+      // File validation for create mode
+      const files = data.coverImage as FileList | undefined;
+      if (!files || files.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Cover image is required.",
+          path: ["coverImage"],
+        });
+      } else {
+        if (files[0].size > MAX_FILE_SIZE)
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Max file size is 5MB.",
+            path: ["coverImage"],
+          });
+        if (!ACCEPTED_IMAGE_TYPES.includes(files[0].type))
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: ".jpg, .jpeg, .png, .webp are accepted.",
+            path: ["coverImage"],
+          });
+      }
+    }
+
+    // --- Validation rules for EDIT mode (optional fields) ---
+    if (mode === "edit") {
+      if (data.title && data.title.length < 5) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Title must be at least 5 characters.",
+          path: ["title"],
+        });
+      }
+      // Add other optional checks for edit mode if needed...
+    }
+  });
+};
