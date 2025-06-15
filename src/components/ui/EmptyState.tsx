@@ -1,5 +1,4 @@
 import type { ReactNode } from "@tanstack/react-router";
-import React from "react";
 
 interface EmptyStateProps {
   icon: ReactNode; // Pass an SVG icon component

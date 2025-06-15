@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import ArticleCard from "./ArticleCard";
 import { useInfiniteArticles } from "../queries";
 import { useInView } from "react-intersection-observer";
@@ -6,6 +5,7 @@ import { useAuth } from "../../../hooks/useAuth";
 import { Link } from "@tanstack/react-router";
 import { DocumentPlusIcon } from "@heroicons/react/24/solid";
 import EmptyState from "../../../components/ui/EmptyState";
+import { useEffect } from "react";
 export default function ArticleList() {
   const { user: currentUser } = useAuth();
   const {

@@ -20,7 +20,7 @@ export const useInfiniteArticles = () => {
     queryKey: articleKeys.allLists(),
     queryFn: ({ pageParam }) => articleService.fetchArticles(pageParam),
     initialPageParam: 1,
-    getNextPageParam: (lastPage, allPages) => {
+    getNextPageParam: (lastPage) => {
       return lastPage.pagination.hasNextPage
         ? lastPage.pagination.currentPage + 1
         : undefined;

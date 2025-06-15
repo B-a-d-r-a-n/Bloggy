@@ -1,4 +1,3 @@
-import React from "react";
 import type { ArticleFull } from "../../../core/types/article";
 import { CalendarDaysIcon, ClockIcon } from "@heroicons/react/24/outline";
 import DOMPurify from "dompurify";

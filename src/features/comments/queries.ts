@@ -4,10 +4,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import commentService from "../../core/services/commentService";
-import type {
-  PopulatedComment,
-  AddCommentResponse,
-} from "../../core/types/comment";
+
 export const commentKeys = {
   all: (articleId: string) => ["comments", articleId] as const,
   lists: (articleId: string) =>
@@ -19,7 +16,7 @@ export const useGetComments = (articleId: string) => {
     queryFn: ({ pageParam }) =>
       commentService.fetchComments(articleId, pageParam),
     initialPageParam: 1,
-    getNextPageParam: (lastPage, allPages) => {
+    getNextPageParam: (lastPage) => {
       return lastPage.pagination.hasNextPage
         ? lastPage.pagination.currentPage + 1
         : undefined;
@@ -52,7 +49,7 @@ export const useDeleteComment = (articleId: string) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (commentId: string) => commentService.deleteComment(commentId),
-    onSuccess: (deletedData, commentId) => {
+    onSuccess: (commentId) => {
       console.log(`Comment ${commentId} deleted successfully.`);
       queryClient.invalidateQueries({ queryKey: commentKeys.lists(articleId) });
     },

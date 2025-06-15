@@ -1,4 +1,3 @@
-import React from "react";
 import NavBar from "../components/ui/NavBar";
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import { FloatingCreateButton } from "../components/ui/FloatingCreateButton";
