@@ -1,8 +1,11 @@
 import React, { useEffect } from "react";
 import ArticleCard from "./ArticleCard";
-import { useInfiniteArticles } from "../queries"; 
-import { useInView } from "react-intersection-observer"; 
+import { useInfiniteArticles } from "../queries";
+import { useInView } from "react-intersection-observer";
 import { useAuth } from "../../../hooks/useAuth";
+import { Link } from "@tanstack/react-router";
+import { DocumentPlusIcon } from "@heroicons/react/24/solid";
+import EmptyState from "../../../components/ui/EmptyState";
 export default function ArticleList() {
   const { user: currentUser } = useAuth();
   const {
@@ -14,7 +17,7 @@ export default function ArticleList() {
     isFetchingNextPage,
   } = useInfiniteArticles();
   const { ref, inView } = useInView({
-    threshold: 0, 
+    threshold: 0,
   });
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
@@ -36,15 +39,41 @@ export default function ArticleList() {
       </div>
     );
   }
+
   const articles = data?.pages.flatMap((page) => page.data) ?? [];
+  if (articles.length === 0) {
+    return (
+      <div className="mt-16">
+        <EmptyState
+          icon={<DocumentPlusIcon />}
+          title="No Articles Yet"
+          description={
+            currentUser
+              ? "Be the first to share your thoughts! Get started by creating a new article."
+              : "It looks a little empty here. Check back soon for new articles!"
+          }
+          // Conditionally show a "Create Article" button if the user is logged in
+          action={
+            currentUser && (
+              <Link
+                to="/articles/action"
+                search={{ mode: "create" }}
+                className="btn btn-primary"
+              >
+                Create First Article
+              </Link>
+            )
+          }
+        />
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col items-center gap-y-8">
       {articles.map((article) => (
         <ArticleCard key={article._id} article={article} />
       ))}
-      {}
-      {}
-      {}
+
       <div ref={ref} className="h-10 w-full">
         {isFetchingNextPage && (
           <div className="text-center">
