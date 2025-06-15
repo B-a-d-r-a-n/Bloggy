@@ -3,6 +3,7 @@ import type { PopulatedComment } from "../../../core/types/comment";
 import { useAuth } from "../../../hooks/useAuth";
 import CommentForm from "./commentForm";
 import { useDeleteComment, usePostReply } from "../queries";
+import { getUserAvatar } from "../../../lib/utils";
 interface CommentItemProps {
   comment: PopulatedComment;
   articleId: string;
@@ -37,7 +38,7 @@ export default function CommentItem({ comment, articleId }: CommentItemProps) {
       <div className="avatar">
         <div className="w-10 h-10 rounded-full">
           <img
-            src={comment.author.avatarUrl || "/default-avatar.png"}
+            src={getUserAvatar(comment.author.name, comment.author.avatarUrl)}
             alt={comment.author.name}
           />
         </div>
@@ -76,7 +77,7 @@ export default function CommentItem({ comment, articleId }: CommentItemProps) {
           <div className="mt-4">
             <CommentForm
               onSubmit={handleReplySubmit}
-              isSubmitting={false }
+              isSubmitting={false}
               submitLabel="Reply"
             />
           </div>

@@ -2,6 +2,7 @@ import React from "react";
 import type { ArticleFull } from "../../../core/types/article";
 import { CalendarDaysIcon, ClockIcon } from "@heroicons/react/24/outline";
 import DOMPurify from "dompurify";
+import { getUserAvatar } from "../../../lib/utils";
 interface ArticleDetailDisplayProps {
   article: ArticleFull;
 }
@@ -29,7 +30,10 @@ export default function ArticleDetailDisplay({
           <div className="avatar">
             <div className="w-12 h-12 rounded-full">
               <img
-                src={article.author.avatarUrl || "/default-avatar.png"}
+                src={getUserAvatar(
+                  article.author.name,
+                  article.author.avatarUrl
+                )}
                 alt={article.author.name}
               />
             </div>

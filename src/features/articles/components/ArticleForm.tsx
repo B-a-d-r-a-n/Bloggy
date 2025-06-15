@@ -1,24 +1,30 @@
 import React, { useMemo } from "react";
 import { useForm, Controller, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type ArticleFormValues, getArticleFormSchema } from "../validation";
-import type { ArticleFull } from "../../../core/types/article";
-import Input from "../../../components/ui/Input";
-import RichTextEditor from "./RichTextEditor";
-import Combobox from "../../../components/ui/combobox";
+import { getArticleFormSchema, type ArticleFormValues } from "../validation";
+
 import {
   useCreateTag,
   useGetCategories,
   useGetTags,
 } from "../../shared/queries";
+
+// UI Component Imports
+import Input from "../../../components/ui/Input";
+import RichTextEditor from "./RichTextEditor";
 import MultiSelectCombobox from "../../../components/ui/MultiSelectCombobox";
+import type { ArticleFull } from "../../../core/types/article";
+import Combobox from "../../../components/ui/combobox";
 import type { Tag } from "../../../core/types/tag";
+
+// Define the component's props
 interface ArticleFormProps {
   mode: "create" | "edit";
   initialData?: ArticleFull;
   onSubmit: (data: FormData) => void;
   isSubmitting: boolean;
 }
+
 export default function ArticleForm({
   mode,
   initialData,
@@ -26,11 +32,14 @@ export default function ArticleForm({
   isSubmitting,
 }: ArticleFormProps) {
   const isEditMode = mode === "edit";
+
+  // --- 1. HOOKS AT THE TOP ---
   const { data: categories = [], isLoading: isLoadingCategories } =
     useGetCategories();
   const { data: tagsData = [], isLoading: isLoadingTags } = useGetTags();
   const createTagMutation = useCreateTag();
   const formSchema = useMemo(() => getArticleFormSchema(mode), [mode]);
+
   const {
     register,
     handleSubmit,
@@ -44,7 +53,7 @@ export default function ArticleForm({
           summary: initialData?.summary || "",
           content: initialData?.content || "",
           category: initialData?.category?._id || "",
-          tags: initialData?.tags, 
+          tags: initialData?.tags || [],
         }
       : {
           title: "",
@@ -52,46 +61,85 @@ export default function ArticleForm({
           content: "",
           category: "",
           tags: [],
+          coverImage: undefined, // Explicitly set file input default to undefined
         },
   });
-  console.log("React Hook Form Errors:", errors);
-  const handleFormSubmit: SubmitHandler<ArticleFormValues> = (data) => {
-    console.log("2. Form: handleFormSubmit called with RHF data:", data);
-    const formData = new FormData();
-    const { tags, ...restOfData } = data;
-    if (tags) {
-      const tagIds = tags.map((tag) => tag._id);
-      formData.append("tags", JSON.stringify(tagIds));
-    }
-    Object.entries(restOfData).forEach(([key, value]) => {
-      if (key === "coverImage" && value && (value as FileList).length > 0) {
-        formData.append(key, (value as FileList)[0]);
-      } else if (value && key !== "coverImage") {
-        formData.append(key, value as string);
-      }
-    });
-    onSubmit(formData);
-  };
+
+  // --- 2. HANDLER FUNCTIONS ---
   const handleCreateTag = async (tagName: string): Promise<Tag | null> => {
     try {
-      const response = await createTagMutation.mutateAsync(tagName);
-      return response.data; 
+      // The `mutateAsync` promise will resolve with the value from `onSuccess` or throw an error
+      const newTagResponse = await createTagMutation.mutateAsync(tagName);
+      return newTagResponse.data; // Assuming your service/hook returns the response
     } catch (error: any) {
       console.error("Failed to create tag:", error);
+      // It's better to show errors via a state update rather than `alert`
+      // For now, this is functional.
       alert(
         `Error: ${error.response?.data?.message || "Could not create tag"}`
       );
       return null;
     }
   };
+  const handleFormSubmit: SubmitHandler<ArticleFormValues> = (data) => {
+    console.log("Form data received from RHF:", data);
+
+    const formData = new FormData();
+
+    // --- THIS IS THE FIX ---
+
+    // 1. Handle the cover image explicitly and first.
+    //    The `data.coverImage` from RHF will be a FileList.
+    if (data.coverImage && data.coverImage.length > 0) {
+      // If a file was selected, append the first file from the list.
+      formData.append("coverImage", data.coverImage[0]);
+    }
+
+    // 2. Handle tags separately as before.
+    if (data.tags && data.tags.length > 0) {
+      const tagIds = data.tags.map((tag) => tag._id);
+      formData.append("tags", JSON.stringify(tagIds));
+    }
+
+    // 3. Loop over the rest of the data keys.
+    //    We create a list of keys to exclude to avoid processing them again.
+    const excludedKeys = ["tags", "coverImage"];
+
+    for (const key in data) {
+      if (excludedKeys.includes(key)) {
+        continue; // Skip tags and coverImage as we've already handled them
+      }
+
+      // Get the value for the current key
+      const value = data[key as keyof ArticleFormValues];
+
+      // Append the value if it's not null/undefined
+      if (value !== null && value !== undefined) {
+        formData.append(key, value as string);
+      }
+    }
+
+    // --- For Debugging ---
+    console.log("Submitting FormData with the following entries:");
+    for (const [key, value] of formData.entries()) {
+      console.log(key, ":", value);
+    }
+
+    onSubmit(formData);
+  };
+
+  // --- 3. JSX RENDER ---
   return (
     <form
       onSubmit={handleSubmit(handleFormSubmit)}
       className="space-y-6 max-w-4xl mx-auto"
+      // Add noValidate to prevent default browser validation, letting RHF/Zod handle it
+      noValidate
     >
       <h1 className="text-3xl font-bold">
         {isEditMode ? "Edit Article" : "Create a New Article"}
       </h1>
+
       <Input
         label="Article Title"
         name="title"
@@ -99,6 +147,7 @@ export default function ArticleForm({
         error={errors.title?.message}
         disabled={isSubmitting}
       />
+
       <div>
         <label className="label">
           <span className="label-text">Summary</span>
@@ -107,6 +156,7 @@ export default function ArticleForm({
           {...register("summary")}
           className={`textarea textarea-bordered w-full ${errors.summary ? "textarea-error" : ""}`}
           rows={3}
+          disabled={isSubmitting}
         ></textarea>
         {errors.summary && (
           <span className="text-error text-xs mt-1">
@@ -114,7 +164,7 @@ export default function ArticleForm({
           </span>
         )}
       </div>
-      {}
+
       <div>
         <label className="label">
           <span className="label-text">Category</span>
@@ -139,7 +189,7 @@ export default function ArticleForm({
           </span>
         )}
       </div>
-      {}
+
       <div>
         <label className="label">
           <span className="label-text">Tags</span>
@@ -160,20 +210,21 @@ export default function ArticleForm({
             />
           )}
         />
-        {}
         {errors.tags && (
           <span className="text-error text-xs mt-1">{errors.tags.message}</span>
         )}
       </div>
-      {}
+
       <div>
         <label className="label">
           <span className="label-text">Cover Image</span>
         </label>
         <input
           type="file"
+          accept="image/png, image/jpeg, image/webp"
           {...register("coverImage")}
           className={`file-input file-input-bordered w-full ${errors.coverImage ? "file-input-error" : ""}`}
+          disabled={isSubmitting}
         />
         {errors.coverImage && (
           <span className="text-error text-xs mt-1">
@@ -181,6 +232,7 @@ export default function ArticleForm({
           </span>
         )}
       </div>
+
       <div>
         <label className="label">
           <span className="label-text">Content</span>
@@ -188,9 +240,11 @@ export default function ArticleForm({
         <Controller
           name="content"
           control={control}
-          defaultValue={initialData?.content || ""}
           render={({ field }) => (
-            <RichTextEditor content={field.value!} onChange={field.onChange} />
+            <RichTextEditor
+              content={field.value || ""}
+              onChange={field.onChange}
+            />
           )}
         />
         {errors.content && (
@@ -199,6 +253,7 @@ export default function ArticleForm({
           </span>
         )}
       </div>
+
       <button
         type="submit"
         className="btn btn-primary btn-lg"

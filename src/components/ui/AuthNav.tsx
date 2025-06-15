@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { useAuth } from "../../hooks/useAuth"; 
+import { useAuth } from "../../hooks/useAuth";
+import { getUserAvatar } from "../../lib/utils";
 export function AuthNav() {
   const { user, logout } = useAuth();
   if (!user) {
@@ -14,11 +15,7 @@ export function AuthNav() {
       </>
     );
   }
-  const initials = user?.name
-    .split(" ")
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join("");
+
   return (
     <div className="dropdown dropdown-end">
       <div
@@ -26,15 +23,12 @@ export function AuthNav() {
         role="button"
         className="btn btn-ghost btn-circle avatar placeholder"
       >
-        {user.avatarUrl ? (
-          <div className="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-            <img alt="User Avatar" src={user.avatarUrl} />
-          </div>
-        ) : (
-          <div className="bg-neutral text-neutral-content rounded-full w-10 ring ring-primary ring-offset-base-100 ring-offset-2">
-            <span className="text-xl">{initials}</span>
-          </div>
-        )}
+        <div className="w-10 rounded-full ring ...">
+          <img
+            alt="User Avatar"
+            src={getUserAvatar(user.name, user.avatarUrl)}
+          />
+        </div>
       </div>
       <ul
         tabIndex={0}

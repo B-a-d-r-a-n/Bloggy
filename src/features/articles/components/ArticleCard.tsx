@@ -3,12 +3,12 @@ import ArticleActions from "./ArticleActions";
 import type { ArticleListItem } from "../../../core/types/article";
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "../../../hooks/useAuth";
+import { getUserAvatar } from "../../../lib/utils";
 interface ArticleCardProps {
   article: ArticleListItem;
 }
 export default function ArticleCard({ article }: ArticleCardProps) {
   const { user: currentUser } = useAuth();
-  const VITE_API_URL = import.meta.env.VITE_API_URL;
   return (
     <div className="card w-full max-w-2xl bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 group ">
       <Link
@@ -20,7 +20,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
           <img
             src={
               article.coverImageUrl
-                ? `${VITE_API_URL}/${article.coverImageUrl}`
+                ? `${article.coverImageUrl}`
                 : "/default-cover.jpg"
             }
             alt={`Cover image for ${article.title}`}
@@ -48,8 +48,11 @@ export default function ArticleCard({ article }: ArticleCardProps) {
             <div className="avatar">
               <div className="w-8 h-8 rounded-full">
                 <img
-                  src={article.author.avatarUrl || "/default-avatar.png"}
-                  alt={article.author.name}
+                  src={getUserAvatar(
+                    article.author.name,
+                    article.author.avatarUrl
+                  )}
+                  alt={`Avatar of ${article.author.name}`}
                 />
               </div>
             </div>

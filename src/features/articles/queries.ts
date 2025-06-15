@@ -5,10 +5,8 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import articleService from "../../core/services/articleService";
-import type { PaginatedArticlesResponse } from "../../core/types/api";
-import type {
-  ArticleFull,
-} from "../../core/types/article";
+// import type { PaginatedArticlesResponse } from "../../core/types/api";
+import type { ArticleFull } from "../../core/types/article";
 import { useNavigate } from "@tanstack/react-router";
 export const articleKeys = {
   all: ["articles"] as const,
@@ -19,13 +17,13 @@ export const articleKeys = {
 };
 export const useInfiniteArticles = () => {
   return useInfiniteQuery({
-    queryKey: articleKeys.allLists(), 
+    queryKey: articleKeys.allLists(),
     queryFn: ({ pageParam }) => articleService.fetchArticles(pageParam),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.pagination.hasNextPage
         ? lastPage.pagination.currentPage + 1
-        : undefined; 
+        : undefined;
     },
   });
 };
@@ -35,7 +33,7 @@ export const useGetArticleById = (
 ) => {
   return useQuery<ArticleFull, Error>({
     queryKey: articleKeys.detail(articleId),
-    queryFn: () => articleService.fetchArticleById(articleId), 
+    queryFn: () => articleService.fetchArticleById(articleId),
     ...options,
   });
 };
@@ -79,7 +77,7 @@ export const useUpdateArticle = () => {
       navigate({
         to: "/articles/$articleId",
         params: { articleId: updatedArticle._id },
-        replace: true, 
+        replace: true,
       });
     },
   });

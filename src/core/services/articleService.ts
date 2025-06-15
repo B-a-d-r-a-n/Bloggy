@@ -14,8 +14,20 @@ class ArticleService {
     );
     return response.data;
   }
-  async createNewArticle(formData: FormData): Promise<ArticleFull> {
-    const response = await api.post<ArticleFull>(`/api/v1/articles`, formData);
+  async createNewArticle(formData: FormData) {
+    const response = await api.post(
+      `/api/v1/articles`,
+      formData,
+      // --- THIS IS THE FIX ---
+      // Explicitly override the headers for THIS request only.
+      // Setting Content-Type to `multipart/form-data` tells Axios
+      // to let the browser handle setting the correct boundary.
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
     return response.data;
   }
   async editExistingArticle(
@@ -24,7 +36,12 @@ class ArticleService {
   ): Promise<ArticleFull> {
     const response = await api.patch<ArticleFull>(
       `/api/v1/articles/${articleId}`,
-      formData
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
     );
     return response.data;
   }
