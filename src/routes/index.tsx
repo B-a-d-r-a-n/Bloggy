@@ -1,6 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-
-// This is the React component
 const HomePage = () => {
   return (
     <div className="text-center p-8">
@@ -9,8 +7,6 @@ const HomePage = () => {
     </div>
   );
 };
-
-// This defines the route and connects it to the component.
 export const Route = createFileRoute("/")({
   component: HomePage,
 });

@@ -1,6 +1,4 @@
 import { z } from "zod";
-
-// Schema for the Signup Form
 export const signupSchema = z
   .object({
     name: z
@@ -14,15 +12,11 @@ export const signupSchema = z
   })
   .refine((data) => data.password === data.passwordConfirm, {
     message: "Passwords do not match.",
-    path: ["passwordConfirm"], // Set the error on the passwordConfirm field
+    path: ["passwordConfirm"], 
   });
-
-// Schema for the Login Form
 export const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
-  password: z.string().min(1, { message: "Password is required." }), // Simple check for login
+  password: z.string().min(1, { message: "Password is required." }), 
 });
-
-// Create TypeScript types from the Zod schemas
 export type SignupFormValues = z.infer<typeof signupSchema>;
 export type LoginFormValues = z.infer<typeof loginSchema>;

@@ -5,9 +5,7 @@ import { Link } from "@tanstack/react-router";
 import { useAuth } from "../../../hooks/useAuth";
 interface ArticleCardProps {
   article: ArticleListItem;
-  // ... other props like currentUser
 }
-
 export default function ArticleCard({ article }: ArticleCardProps) {
   const { user: currentUser } = useAuth();
   const VITE_API_URL = import.meta.env.VITE_API_URL;
@@ -30,14 +28,12 @@ export default function ArticleCard({ article }: ArticleCardProps) {
           />
         </figure>
       </Link>
-
       <div className="card-body p-6 gap-3">
         {article.category && (
           <div className="badge badge-primary badge-lg">
             {article.category.name}
           </div>
         )}
-
         <h2 className="card-title text-2xl lg:text-3xl font-bold !justify-start ">
           <Link
             to="/articles/$articleId"
@@ -47,7 +43,6 @@ export default function ArticleCard({ article }: ArticleCardProps) {
             {article.title}
           </Link>
         </h2>
-
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-base-content/70">
           <div className="flex items-center gap-2">
             <div className="avatar">
@@ -65,11 +60,9 @@ export default function ArticleCard({ article }: ArticleCardProps) {
           <span className="opacity-70">•</span>
           <span>{article.readTimeInMinutes} min read</span>
         </div>
-
         <p className="text-base-content/90 leading-relaxed mt-2 break-words">
           {article.summary}
         </p>
-
         <div className="card-actions justify-between items-center mt-auto border-t border-base-content/10 pt-4">
           <div className="flex flex-wrap gap-2">
             {article.tags?.map((tag) => (
@@ -78,8 +71,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
               </div>
             ))}
           </div>
-
-          {/* ArticleActions is now self-contained, using the article data from this component */}
+          {}
           <ArticleActions
             articleId={article._id}
             author={article.author}

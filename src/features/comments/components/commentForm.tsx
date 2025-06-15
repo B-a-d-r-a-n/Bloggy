@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-
 interface CommentFormProps {
   onSubmit: (text: string) => void;
   isSubmitting: boolean;
   submitLabel?: string;
   initialText?: string;
 }
-
 export default function CommentForm({
   onSubmit,
   isSubmitting,
@@ -14,14 +12,12 @@ export default function CommentForm({
   initialText = "",
 }: CommentFormProps) {
   const [text, setText] = useState(initialText);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (text.trim() === "") return;
     onSubmit(text);
-    setText(""); // Clear form on submit
+    setText(""); 
   };
-
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-2">
       <textarea

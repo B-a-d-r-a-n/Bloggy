@@ -1,10 +1,7 @@
-// src/components/layout/AuthNav.tsx
 import { Link } from "@tanstack/react-router";
-import { useAuth } from "../../hooks/useAuth"; // Adjust path if needed
-
+import { useAuth } from "../../hooks/useAuth"; 
 export function AuthNav() {
   const { user, logout } = useAuth();
-
   if (!user) {
     return (
       <>
@@ -30,12 +27,10 @@ export function AuthNav() {
         className="btn btn-ghost btn-circle avatar placeholder"
       >
         {user.avatarUrl ? (
-          // If there IS an avatar, show it
           <div className="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
             <img alt="User Avatar" src={user.avatarUrl} />
           </div>
         ) : (
-          // If there is NO avatar, show the placeholder with initials
           <div className="bg-neutral text-neutral-content rounded-full w-10 ring ring-primary ring-offset-base-100 ring-offset-2">
             <span className="text-xl">{initials}</span>
           </div>

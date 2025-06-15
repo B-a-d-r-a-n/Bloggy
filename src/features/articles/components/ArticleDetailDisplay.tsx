@@ -1,19 +1,14 @@
 import React from "react";
 import type { ArticleFull } from "../../../core/types/article";
 import { CalendarDaysIcon, ClockIcon } from "@heroicons/react/24/outline";
-
 import DOMPurify from "dompurify";
-
 interface ArticleDetailDisplayProps {
   article: ArticleFull;
 }
-
 export default function ArticleDetailDisplay({
   article,
 }: ArticleDetailDisplayProps) {
-  // Sanitize the HTML content before rendering it.
   const cleanHtml = DOMPurify.sanitize(article.content);
-
   return (
     <article className="max-w-4xl mx-auto">
       <div className="text-center mb-4">
@@ -23,15 +18,12 @@ export default function ArticleDetailDisplay({
           </div>
         )}
       </div>
-
       <h1 className="text-4xl lg:text-5xl font-extrabold text-center text-base-content mb-6 break-all">
         {article.title}
       </h1>
-
       <p className="text-lg lg:text-xl text-center text-base-content/70 mb-8 max-w-3xl mx-auto break-all">
         {article.summary}
       </p>
-
       <div className="flex flex-col sm:flex-row justify-center items-center gap-x-6 gap-y-4 mb-8 border-y border-base-300 py-4">
         <div className="flex items-center gap-3">
           <div className="avatar">
@@ -47,7 +39,6 @@ export default function ArticleDetailDisplay({
             <p className="text-sm text-base-content/60">Author</p>
           </div>
         </div>
-
         <div className="flex items-center gap-x-6 gap-y-2 text-base-content/70">
           <div className="flex items-center gap-2">
             <CalendarDaysIcon className="w-5 h-5" />
@@ -67,7 +58,6 @@ export default function ArticleDetailDisplay({
           </div>
         </div>
       </div>
-
       {article.coverImageUrl && (
         <figure className="mb-8 rounded-lg overflow-hidden shadow-lg">
           <img
@@ -77,13 +67,11 @@ export default function ArticleDetailDisplay({
           />
         </figure>
       )}
-
       <div
         className="prose lg:prose-xl max-w-none mx-auto text-base-content"
         style={{ overflowWrap: "break-word" }}
         dangerouslySetInnerHTML={{ __html: cleanHtml }}
       />
-
       {article.tags && article.tags.length > 0 && (
         <div className="mt-12 pt-6 border-t border-base-300">
           <h3 className="text-lg font-semibold mb-3">Tags</h3>

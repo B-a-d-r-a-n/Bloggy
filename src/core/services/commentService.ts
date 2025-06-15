@@ -3,9 +3,7 @@ import type {
   PaginatedCommentsResponse,
   AddCommentResponse,
 } from "../types/comment";
-
 class CommentService {
-  // Calls GET /api/v1/articles/:articleId/comments
   async fetchComments(
     articleId: string,
     page: number = 1
@@ -15,8 +13,6 @@ class CommentService {
     );
     return response.data;
   }
-
-  // Calls POST /api/v1/articles/:articleId/comments
   async postComment(
     articleId: string,
     text: string
@@ -27,8 +23,6 @@ class CommentService {
     );
     return response.data;
   }
-
-  // Calls POST /api/v1/comments/:commentId/replies
   async postReply(
     commentId: string,
     text: string
@@ -39,16 +33,13 @@ class CommentService {
     );
     return response.data;
   }
-
-  // Calls DELETE /api/v1/comments/:commentId
   async deleteComment(commentId: string): Promise<void> {
     console.log(
       "Service is about to call api.delete for commentId:",
       commentId
     );
     await api.delete(`/api/v1/comments/${commentId}`);
-    console.log("Service call to api.delete completed."); // You won't see this if it thro
+    console.log("Service call to api.delete completed."); 
   }
 }
-
 export default new CommentService();

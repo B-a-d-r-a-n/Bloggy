@@ -13,17 +13,12 @@ import {
 } from "../../shared/queries";
 import MultiSelectCombobox from "../../../components/ui/MultiSelectCombobox";
 import type { Tag } from "../../../core/types/tag";
-
 interface ArticleFormProps {
   mode: "create" | "edit";
   initialData?: ArticleFull;
   onSubmit: (data: FormData) => void;
   isSubmitting: boolean;
 }
-
-// No need for a separate `FormInputValues` type anymore.
-// We'll use the one from our validation file.
-
 export default function ArticleForm({
   mode,
   initialData,
@@ -31,19 +26,11 @@ export default function ArticleForm({
   isSubmitting,
 }: ArticleFormProps) {
   const isEditMode = mode === "edit";
-
   const { data: categories = [], isLoading: isLoadingCategories } =
     useGetCategories();
-
   const { data: tagsData = [], isLoading: isLoadingTags } = useGetTags();
-
   const createTagMutation = useCreateTag();
-
-  // --- THIS IS THE KEY FIX ---
-  // We create the schema inside the component based on the mode.
-  // `useMemo` ensures the schema is not recreated on every render unless `mode` changes.
   const formSchema = useMemo(() => getArticleFormSchema(mode), [mode]);
-
   const {
     register,
     handleSubmit,
@@ -57,7 +44,7 @@ export default function ArticleForm({
           summary: initialData?.summary || "",
           content: initialData?.content || "",
           category: initialData?.category?._id || "",
-          tags: initialData?.tags, // This is now correctly Tag[]
+          tags: initialData?.tags, 
         }
       : {
           title: "",
@@ -68,40 +55,29 @@ export default function ArticleForm({
         },
   });
   console.log("React Hook Form Errors:", errors);
-  // The submit handler can be simplified. No need for `safeParse` anymore
-  // because the resolver handles the dynamic validation.
   const handleFormSubmit: SubmitHandler<ArticleFormValues> = (data) => {
     console.log("2. Form: handleFormSubmit called with RHF data:", data);
     const formData = new FormData();
-
-    // This logic is now cleaner as well
     const { tags, ...restOfData } = data;
-
     if (tags) {
       const tagIds = tags.map((tag) => tag._id);
       formData.append("tags", JSON.stringify(tagIds));
     }
-
     Object.entries(restOfData).forEach(([key, value]) => {
       if (key === "coverImage" && value && (value as FileList).length > 0) {
         formData.append(key, (value as FileList)[0]);
       } else if (value && key !== "coverImage") {
-        // Exclude empty coverImage
         formData.append(key, value as string);
       }
     });
-
     onSubmit(formData);
   };
-
   const handleCreateTag = async (tagName: string): Promise<Tag | null> => {
     try {
       const response = await createTagMutation.mutateAsync(tagName);
-      return response.data; // Return the new tag object
+      return response.data; 
     } catch (error: any) {
-      // Handle case where tag already exists, or other errors
       console.error("Failed to create tag:", error);
-      // You could use a toast notification library here to show the error
       alert(
         `Error: ${error.response?.data?.message || "Could not create tag"}`
       );
@@ -116,7 +92,6 @@ export default function ArticleForm({
       <h1 className="text-3xl font-bold">
         {isEditMode ? "Edit Article" : "Create a New Article"}
       </h1>
-
       <Input
         label="Article Title"
         name="title"
@@ -124,7 +99,6 @@ export default function ArticleForm({
         error={errors.title?.message}
         disabled={isSubmitting}
       />
-
       <div>
         <label className="label">
           <span className="label-text">Summary</span>
@@ -140,8 +114,7 @@ export default function ArticleForm({
           </span>
         )}
       </div>
-
-      {/* --- CATEGORY COMBOBOX --- */}
+      {}
       <div>
         <label className="label">
           <span className="label-text">Category</span>
@@ -166,7 +139,7 @@ export default function ArticleForm({
           </span>
         )}
       </div>
-      {/* --- TAGS MULTI-SELECT COMBOBOX --- */}
+      {}
       <div>
         <label className="label">
           <span className="label-text">Tags</span>
@@ -176,12 +149,7 @@ export default function ArticleForm({
           control={control}
           render={({ field }) => (
             <MultiSelectCombobox
-              // Use the renamed variable for the options
               options={tagsData}
-              // --- FIX 2: THE TYPES NOW MATCH ---
-              // `field.value` is `Tag[] | undefined`
-              // `selected` prop expects `Tag[]`
-              // The `|| []` handles the undefined case.
               selected={field.value || []}
               onChange={field.onChange}
               placeholder={
@@ -192,14 +160,12 @@ export default function ArticleForm({
             />
           )}
         />
-        {/* Added a more type-safe way to access the error message */}
+        {}
         {errors.tags && (
           <span className="text-error text-xs mt-1">{errors.tags.message}</span>
         )}
       </div>
-
-      {/* ... rest of the form ... */}
-
+      {}
       <div>
         <label className="label">
           <span className="label-text">Cover Image</span>
@@ -215,7 +181,6 @@ export default function ArticleForm({
           </span>
         )}
       </div>
-
       <div>
         <label className="label">
           <span className="label-text">Content</span>
@@ -234,7 +199,6 @@ export default function ArticleForm({
           </span>
         )}
       </div>
-
       <button
         type="submit"
         className="btn btn-primary btn-lg"

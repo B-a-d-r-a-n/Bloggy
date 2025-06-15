@@ -1,6 +1,5 @@
 import { z } from "zod";
-
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 5 * 1024 * 1024; 
 const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
   "image/jpg",
@@ -13,7 +12,6 @@ const tagSchema = z.object({
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
 });
-// This is the base shape of our form data, with everything optional.
 const baseArticleFormSchema = z.object({
   title: z.string().optional(),
   summary: z.string().optional(),
@@ -22,14 +20,9 @@ const baseArticleFormSchema = z.object({
   tags: z.array(tagSchema).optional(),
   coverImage: z.any().optional(),
 });
-
-// Create a TypeScript type from this base schema
 export type ArticleFormValues = z.infer<typeof baseArticleFormSchema>;
-
-// This is our new, unified schema that we will pass to the form.
 export const getArticleFormSchema = (mode: "create" | "edit") => {
   return baseArticleFormSchema.superRefine((data, ctx) => {
-    // --- Validation rules for CREATE mode ---
     if (mode === "create") {
       if (!data.title || data.title.length < 5) {
         ctx.addIssue({
@@ -66,7 +59,6 @@ export const getArticleFormSchema = (mode: "create" | "edit") => {
           path: ["content"],
         });
       }
-      // File validation for create mode
       const files = data.coverImage as FileList | undefined;
       if (!files || files.length === 0) {
         ctx.addIssue({
@@ -89,8 +81,6 @@ export const getArticleFormSchema = (mode: "create" | "edit") => {
           });
       }
     }
-
-    // --- Validation rules for EDIT mode (optional fields) ---
     if (mode === "edit") {
       if (data.title && data.title.length < 5) {
         ctx.addIssue({
@@ -99,7 +89,6 @@ export const getArticleFormSchema = (mode: "create" | "edit") => {
           path: ["title"],
         });
       }
-      // Add other optional checks for edit mode if needed...
     }
   });
 };

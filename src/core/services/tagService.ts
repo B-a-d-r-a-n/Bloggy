@@ -1,6 +1,5 @@
 import { api } from "../../lib/api";
 import type { Tag } from "../types/tag";
-
 interface TagListResponse {
   status: "success";
   results: number;
@@ -10,7 +9,6 @@ interface CreateTagResponse {
   status: "success";
   data: Tag;
 }
-
 class TagService {
   async fetchTags(): Promise<TagListResponse> {
     const response = await api.get<TagListResponse>("/api/v1/tags");
@@ -23,5 +21,4 @@ class TagService {
     return response.data;
   }
 }
-
 export default new TagService();

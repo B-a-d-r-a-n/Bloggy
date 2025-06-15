@@ -1,34 +1,26 @@
 import React from "react";
-import { useEditor, EditorContent, type Editor } from "@tiptap/react"; // <-- Import the Editor type
+import { useEditor, EditorContent, type Editor } from "@tiptap/react"; 
 import StarterKit from "@tiptap/starter-kit";
 import {
   ChatBubbleLeftRightIcon,
   ListBulletIcon,
   MinusIcon,
   Bars3BottomLeftIcon,
-} from "@heroicons/react/24/outline"; // <-- Import from Heroicons
-
-// --- PROPS INTERFACES ---
+} from "@heroicons/react/24/outline"; 
 interface RichTextEditorProps {
   content: string;
   onChange: (richText: string) => void;
   className?: string;
 }
-
 interface EditorToolbarProps {
-  editor: Editor | null; // <-- Use the official Editor type
+  editor: Editor | null; 
 }
-
 interface ToolbarButtonProps {
   onClick: () => void;
   isActive: boolean;
   children: React.ReactNode;
   ariaLabel: string;
 }
-
-// --- REUSABLE COMPONENTS ---
-
-// 1. Reusable Button Component to reduce repetition
 const ToolbarButton = ({
   onClick,
   isActive,
@@ -44,11 +36,8 @@ const ToolbarButton = ({
     {children}
   </button>
 );
-
-// 2. Toolbar component for the editor
 const EditorToolbar = ({ editor }: EditorToolbarProps) => {
   if (!editor) return null;
-
   return (
     <div className="flex flex-wrap items-center gap-1 border border-base-300 bg-base-200 p-2 rounded-t-lg">
       <ToolbarButton
@@ -72,9 +61,7 @@ const EditorToolbar = ({ editor }: EditorToolbarProps) => {
       >
         <span className="line-through">S</span>
       </ToolbarButton>
-
       <div className="divider divider-horizontal mx-1"></div>
-
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
         isActive={editor.isActive("heading", { level: 1 })}
@@ -89,9 +76,7 @@ const EditorToolbar = ({ editor }: EditorToolbarProps) => {
       >
         <span className="font-bold">H2</span>
       </ToolbarButton>
-
       <div className="divider divider-horizontal mx-1"></div>
-
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleBulletList().run()}
         isActive={editor.isActive("bulletList")}
@@ -123,8 +108,6 @@ const EditorToolbar = ({ editor }: EditorToolbarProps) => {
     </div>
   );
 };
-
-// 3. Main Editor Component
 export default function RichTextEditor({
   content,
   onChange,
@@ -133,7 +116,6 @@ export default function RichTextEditor({
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        // Disable extensions you don't have a button for, like 'code'
         code: false,
         codeBlock: false,
       }),
@@ -144,12 +126,10 @@ export default function RichTextEditor({
     },
     editorProps: {
       attributes: {
-        // Use prose-pre:bg-base-300 etc. to style code blocks if you re-enable them
         class: `prose max-w-none p-4 min-h-[300px] border-x border-b border-base-300 rounded-b-lg focus:outline-none ${className}`,
       },
     },
   });
-
   return (
     <div>
       <EditorToolbar editor={editor} />

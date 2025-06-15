@@ -1,14 +1,12 @@
 import React, { type InputHTMLAttributes } from "react";
 import type { UseFormRegister } from "react-hook-form";
-import { cn } from "../../lib/utils.ts"; // A utility for merging class names (from shadcn)
-
+import { cn } from "../../lib/utils.ts"; 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
   name: string;
-  register: UseFormRegister<any>; // Receive the register function
+  register: UseFormRegister<any>; 
   error?: string;
 }
-
 export default function Input({
   label,
   name,
@@ -23,11 +21,11 @@ export default function Input({
         <span className="label-text">{label}</span>
       </label>
       <input
-        {...register(name)} // Spread the register props here
+        {...register(name)} 
         {...props}
         className={cn(
           "input input-bordered w-full",
-          error && "input-error", // Apply error class if there's an error
+          error && "input-error", 
           className
         )}
       />

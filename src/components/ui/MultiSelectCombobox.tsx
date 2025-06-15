@@ -30,10 +30,9 @@ export default function MultiSelectCombobox({
     if (query.trim() === "") return;
     const newTag = await onCreate(query.trim());
     if (newTag) {
-      // Add the newly created tag to the existing selection
       onChange([...selected, newTag]);
     }
-    setQuery(""); // Clear the input after creating
+    setQuery("");
   };
 
   const handleDeselect = (tagToRemove: Tag) => {
@@ -56,7 +55,7 @@ export default function MultiSelectCombobox({
 
   return (
     <div>
-      {/* --- Display Selected Tags --- */}
+      {/* Display Selected Tags */}
       <div className="flex flex-wrap gap-2 mb-2 min-h-[2.5rem] p-2 bg-base-200 rounded-md">
         {selected.length > 0 ? (
           selected.map((tag) => (
@@ -76,12 +75,8 @@ export default function MultiSelectCombobox({
         )}
       </div>
 
-      {/* --- Combobox --- */}
-      <Combobox
-        value={selected}
-        onChange={onChange} // <-- This directly handles adding/removing from the array
-        multiple
-      >
+      {/* Combobox */}
+      <Combobox value={selected} onChange={onChange} multiple>
         <div className="relative">
           <Combobox.Input
             as="input"
@@ -108,21 +103,19 @@ export default function MultiSelectCombobox({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-base-100 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-10">
-            {/* The "Create" option */}
+          <Combobox.Options className="absolute mt-1 max-h-60 w-80 overflow-auto rounded-md bg-base-100 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-10 min-w-0">
             {showCreateOption && (
               <li
                 className="relative cursor-pointer select-none py-2 px-4 text-primary data-[hover]:bg-primary data-[hover]:text-primary-content"
                 onClick={handleCreate}
               >
-                <span className="font-bold">Create "{query}"</span>
+                <span className="font-bold break-all">Create "{query}"</span>
                 {isCreating && (
                   <span className="loading loading-spinner loading-xs ml-2"></span>
                 )}
               </li>
             )}
 
-            {/* The list of existing tags */}
             {filteredOptions.length === 0 && !showCreateOption ? (
               <div className="relative cursor-default select-none py-2 px-4 text-gray-700">
                 Nothing found.
@@ -133,19 +126,28 @@ export default function MultiSelectCombobox({
                   key={option._id}
                   value={option}
                   className={({ active }) =>
-                    `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? "bg-primary text-primary-content" : "text-base-content"}`
+                    `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                      active
+                        ? "bg-primary text-primary-content"
+                        : "text-base-content"
+                    }`
                   }
                 >
                   {({ selected, active }) => (
                     <>
+                      {/* --- THIS IS THE FIX --- */}
                       <span
-                        className={`block truncate ${selected ? "font-bold" : "font-normal"}`}
+                        className={`block truncate ${
+                          selected ? "font-bold" : "font-normal"
+                        }`}
                       >
                         {option.name}
                       </span>
                       {selected ? (
                         <span
-                          className={`absolute inset-y-0 left-0 flex items-center pl-3 ${active ? "text-white" : "text-primary"}`}
+                          className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
+                            active ? "text-white" : "text-primary"
+                          }`}
                         >
                           <CheckIcon className="h-5 w-5" aria-hidden="true" />
                         </span>

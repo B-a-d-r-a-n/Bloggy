@@ -2,35 +2,27 @@ import React, { useState } from "react";
 import type { PopulatedComment } from "../../../core/types/comment";
 import { useAuth } from "../../../hooks/useAuth";
 import CommentForm from "./commentForm";
-// Import reply mutation hook later
 import { useDeleteComment, usePostReply } from "../queries";
-
 interface CommentItemProps {
   comment: PopulatedComment;
   articleId: string;
 }
-
 export default function CommentItem({ comment, articleId }: CommentItemProps) {
   const [isReplying, setIsReplying] = useState(false);
   const { user } = useAuth();
-
-  // The hook just needs the articleId to know which list to invalidate on success.
   const postReplyMutation = usePostReply(articleId);
   const deleteCommentMutation = useDeleteComment(articleId);
   const handleReplySubmit = (text: string) => {
-    // Call `mutate` with an object that has both `commentId` and `text`.
     postReplyMutation.mutate(
       { commentId: comment._id, text: text },
       {
         onSuccess: () => {
-          // This component-level onSuccess is great for UI-specific actions.
           setIsReplying(false);
         },
       }
     );
   };
   const handleDelete = () => {
-    // Add guard clause for safety
     if (!comment._id) {
       console.error("Cannot delete, comment ID is missing.");
       return;
@@ -40,7 +32,6 @@ export default function CommentItem({ comment, articleId }: CommentItemProps) {
     }
   };
   const isOwner = user?._id === comment.author._id;
-
   return (
     <div className="flex gap-4">
       <div className="avatar">
@@ -66,7 +57,7 @@ export default function CommentItem({ comment, articleId }: CommentItemProps) {
           >
             {isReplying ? "Cancel" : "Reply"}
           </button>
-          {/* --- THIS IS THE FIX --- */}
+          {}
           {isOwner && (
             <button
               className="btn btn-xs btn-ghost text-error"
@@ -81,18 +72,16 @@ export default function CommentItem({ comment, articleId }: CommentItemProps) {
             </button>
           )}
         </div>
-
         {isReplying && (
           <div className="mt-4">
             <CommentForm
               onSubmit={handleReplySubmit}
-              isSubmitting={false /* postReplyMutation.isPending */}
+              isSubmitting={false }
               submitLabel="Reply"
             />
           </div>
         )}
-
-        {/* Render replies here */}
+        {}
         <div className="mt-4 space-y-4">
           {comment.replies?.map((reply) => (
             <CommentItem

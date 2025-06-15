@@ -1,7 +1,5 @@
-// src/core/types/comment.ts
 import type { User } from "./user";
 import type { PaginationInfo } from "./api";
-
 export interface PopulatedComment {
   _id: string;
   text: string;
@@ -10,16 +8,12 @@ export interface PopulatedComment {
   replies?: PopulatedComment[];
   createdAt: string;
   updatedAt: string;
-  isOwner?: boolean; // A frontend-only property
+  isOwner?: boolean; 
 }
-
-// For the paginated GET request
 export interface PaginatedCommentsResponse {
   pagination: PaginationInfo;
   data: PopulatedComment[];
 }
-
-// For POSTing a new comment or reply
 export interface AddCommentResponse {
   status: string;
   data: {
