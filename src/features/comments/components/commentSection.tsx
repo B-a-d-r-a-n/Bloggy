@@ -1,8 +1,7 @@
-import React from "react";
 import { useGetComments, usePostComment } from "../queries";
 import { useAuth } from "../../../hooks/useAuth";
-import CommentForm from "./commentForm";
-import CommentItem from "./coomentItem";
+import CommentItem from "./ComentItem";
+import CommentForm from "./CommentForm";
 interface CommentSectionProps {
   articleId: string;
 }

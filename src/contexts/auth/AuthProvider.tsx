@@ -7,7 +7,7 @@ import type { ReactNode } from "@tanstack/react-router";
 import { authUtils } from "../../lib/authUtils";
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true); 
+  const [isLoading, setIsLoading] = useState(true);
   const checkAuthStatus = useCallback(async () => {
     try {
       const response = await authService.refreshToken();
@@ -16,19 +16,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       authUtils.setToken(accessToken);
       setUser(loggedInUser);
     } catch (error) {
-      console.log("No active session found or refresh failed.");
+      console.log("No active session found or refresh failed.", error);
       authUtils.clearToken();
       setUser(null);
     } finally {
       setIsLoading(false);
     }
-  }, []); 
+  }, []);
   useEffect(() => {
     checkAuthStatus();
   }, [checkAuthStatus]);
-   const login = async (
-    loginInfo: Parameters<typeof authService.login>[0]
-  ) => {
+  const login = async (loginInfo: Parameters<typeof authService.login>[0]) => {
     try {
       const response = await authService.login(loginInfo);
       const accessToken = response.accessToken;
@@ -56,14 +54,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
   const logout = async () => {
     try {
-      await authService.logout(); 
+      await authService.logout();
     } catch (error) {
       console.error(
         "Logout API call failed, but clearing session locally anyway:",
         error
       );
     } finally {
-      authUtils.clearToken(); 
+      authUtils.clearToken();
       setUser(null);
       delete api.defaults.headers.common["Authorization"];
     }

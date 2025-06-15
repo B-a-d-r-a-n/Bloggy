@@ -1,9 +1,9 @@
-import React, { useState } from "react";
 import type { PopulatedComment } from "../../../core/types/comment";
 import { useAuth } from "../../../hooks/useAuth";
-import CommentForm from "./commentForm";
 import { useDeleteComment, usePostReply } from "../queries";
 import { getUserAvatar } from "../../../lib/utils";
+import { useState } from "react";
+import CommentForm from "./CommentForm";
 interface CommentItemProps {
   comment: PopulatedComment;
   articleId: string;

@@ -1,4 +1,3 @@
-import React from "react";
 import ArticleActions from "./ArticleActions";
 import type { ArticleListItem } from "../../../core/types/article";
 import { Link } from "@tanstack/react-router";
