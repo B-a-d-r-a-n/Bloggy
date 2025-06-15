@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useGetArticleById } from "../../features/articles/queries"; // Adjust path
 import ArticleDetailDisplay from "../../features/articles/components/ArticleDetailDisplay"; // Adjust path
-import CommentSection from "../../features/comments/components/commentSection";
+import CommentSection from "../../features/comments/components/CommentSection";
 // Import your comment section when it's ready
 // import CommentSection from '../../features/comments/components/CommentSection';
 
