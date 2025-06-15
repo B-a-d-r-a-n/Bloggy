@@ -1,13 +1,11 @@
 import ArticleActions from "./ArticleActions";
 import type { ArticleListItem } from "../../../core/types/article";
 import { Link } from "@tanstack/react-router";
-import { useAuth } from "../../../hooks/useAuth";
 import { getUserAvatar } from "../../../lib/utils";
 interface ArticleCardProps {
   article: ArticleListItem;
 }
 export default function ArticleCard({ article }: ArticleCardProps) {
-  const { user: currentUser } = useAuth();
   return (
     <div className="card w-full max-w-2xl bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 group ">
       <Link
@@ -74,11 +72,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
             ))}
           </div>
           {}
-          <ArticleActions
-            articleId={article._id}
-            author={article.author}
-            currentUser={currentUser}
-          />
+          <ArticleActions articleId={article._id} author={article.author} />
         </div>
       </div>
     </div>

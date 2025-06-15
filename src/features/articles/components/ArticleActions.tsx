@@ -1,18 +1,14 @@
-import React from "react";
-
 import { useAuth } from "../../../hooks/useAuth";
 import { useDeleteArticle } from "../queries";
 import { useNavigate } from "@tanstack/react-router";
 interface ArticleActionsProps {
   articleId: string;
   author: { _id: string };
-  currentUser?: { _id: string } | null;
 }
 
 export default function ArticleActions({
   articleId,
   author,
-  currentUser,
 }: ArticleActionsProps) {
   const { user } = useAuth();
   const deleteMutation = useDeleteArticle();
