@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { useForm, Controller, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getArticleFormSchema, type ArticleFormValues } from "../validation";
@@ -71,13 +71,9 @@ export default function ArticleForm({
       // The `mutateAsync` promise will resolve with the value from `onSuccess` or throw an error
       const newTagResponse = await createTagMutation.mutateAsync(tagName);
       return newTagResponse.data; // Assuming your service/hook returns the response
-    } catch (error: any) {
+    } catch (error) {
       console.error("Failed to create tag:", error);
-      // It's better to show errors via a state update rather than `alert`
-      // For now, this is functional.
-      alert(
-        `Error: ${error.response?.data?.message || "Could not create tag"}`
-      );
+
       return null;
     }
   };
