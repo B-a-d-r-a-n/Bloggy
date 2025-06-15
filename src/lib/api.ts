@@ -4,11 +4,10 @@ import axios from "axios";
 
 // 1. Create the Axios instance with a base configuration
 export const api = axios.create({
-  // The base URL of your API. This will be prepended to all request paths.
-  // It's best to use an environment variable for this.
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api",
+  baseURL: import.meta.env.VITE_API_URL,
 
-  // Default headers that will be sent with every request
+  // You might need this for your httpOnly refresh token cookie to be sent
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",

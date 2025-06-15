@@ -19,7 +19,7 @@ export interface ArticleListItem {
   category: Pick<Category, "_id" | "name">;
   readTimeInMinutes: number; // `required: true` in the model
   // In a list view, tags might just be an array of string IDs if not populated
-  tags?: string[];
+  tags?: { _id: string; name: string }[];
   commentCount: number; // From the Mongoose virtual property
   createdAt: string;
   updatedAt: string;

@@ -1,9 +1,26 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import SignupForm from "../features/auth/components/SignupForm";
 
 export const Route = createFileRoute("/signup")({
-  component: RouteComponent,
+  beforeLoad: ({ context, location }) => {
+    // Use the same corrected logic here
+    if (context.auth.isAuthenticated()) {
+      throw redirect({
+        to: "/",
+        replace: true,
+        search: {
+          redirect: location.href,
+        },
+      });
+    }
+  },
+  component: SignupPage,
 });
 
-function RouteComponent() {
-  return <div>Hello "/signup"!</div>;
+function SignupPage() {
+  return (
+    <div className="flex justify-center items-center min-h-[calc(100vh-8rem)] py-12">
+      <SignupForm />
+    </div>
+  );
 }

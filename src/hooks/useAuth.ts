@@ -1,14 +1,11 @@
-// src/hooks/useAuth.ts (placeholder for demonstration)
-export const useAuth = () => {
-  // In your real app, this would come from your AuthContext
-  const isAuthenticated = false; // <-- CHANGE THIS to false to see the other state
-  const user = isAuthenticated
-    ? {
-        name: "Alice",
-        avatarUrl: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
-      }
-    : null;
-  const logout = () => console.log("Logging out...");
+import { useContext } from "react";
+import { AuthContext } from "../contexts/auth/AuthContext";
+// Import the context object from its new dedicated file
 
-  return { isAuthenticated, user, logout };
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 };

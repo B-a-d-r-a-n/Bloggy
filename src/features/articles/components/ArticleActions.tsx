@@ -1,17 +1,19 @@
 import React from "react";
-
-export default function ArticleActions({
-  onEdit,
-  onDelete,
-}: {
+interface ArticleActionsProps {
+  author: { _id: string }; // Only needs the ID for comparison
+  currentUser?: { _id: string } | null;
   onEdit: () => void;
   onDelete: () => void;
-}) {
-  // We can return null if no actions are provided, preventing an empty div from rendering.
-  if (!onEdit && !onDelete) {
-    return null;
-  }
+}
+export default function ArticleActions({
+  author,
+  currentUser,
+  onEdit,
+  onDelete,
+}: ArticleActionsProps) {
+  const isOwner = currentUser?._id === author._id;
 
+  if (!isOwner) return null;
   return (
     <div className="flex items-center gap-1">
       {/* Conditionally render the delete button only if the onDelete prop is passed */}

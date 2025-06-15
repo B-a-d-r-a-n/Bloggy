@@ -1,30 +1,30 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema, type LoginFormValues } from "../validation";
+import { signupSchema, type SignupFormValues } from "../validation";
 import { Link, useNavigate } from "@tanstack/react-router";
 import Input from "../../../components/ui/Input";
 import { useAuth } from "../../../hooks/useAuth";
 
-export default function LoginForm() {
-  const { login } = useAuth();
+export default function SignupForm() {
+  const { signup } = useAuth();
   const [formError, setFormError] = React.useState<string | null>(null);
   const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema), // Connect Zod to React Hook Form
+  } = useForm<SignupFormValues>({
+    resolver: zodResolver(signupSchema),
   });
 
-  const onSubmit = async (data: LoginFormValues) => {
+  const onSubmit = async (data: SignupFormValues) => {
     setFormError(null);
     try {
-      await login(data);
-      // --- THIS IS THE FIX ---
-      // On successful login, navigate to the desired page.
-      // We use `replace: true` so the user can't press the "back" button to go back to the login page.
+      // We don't need to send passwordConfirm to the API
+      const { passwordConfirm, ...signupData } = data;
+      await signup({ ...signupData, passwordConfirm });
       navigate({ to: "/", replace: true });
     } catch (error: any) {
       setFormError(
@@ -36,25 +36,39 @@ export default function LoginForm() {
   return (
     <div className="card w-full max-w-md bg-base-100 shadow-xl">
       <form onSubmit={handleSubmit(onSubmit)} className="card-body">
-        <h2 className="card-title justify-center text-2xl">Welcome Back!</h2>
+        <h2 className="card-title justify-center text-2xl">
+          Create an Account
+        </h2>
 
+        <Input
+          label="Full Name"
+          name="name"
+          register={register}
+          error={errors.name?.message}
+          disabled={isSubmitting}
+        />
         <Input
           label="Email Address"
           name="email"
           type="email"
           register={register}
           error={errors.email?.message}
-          placeholder="you@example.com"
           disabled={isSubmitting}
         />
-
         <Input
           label="Password"
           name="password"
           type="password"
           register={register}
           error={errors.password?.message}
-          placeholder="••••••••"
+          disabled={isSubmitting}
+        />
+        <Input
+          label="Confirm Password"
+          name="passwordConfirm"
+          type="password"
+          register={register}
+          error={errors.passwordConfirm?.message}
           disabled={isSubmitting}
         />
 
@@ -71,15 +85,15 @@ export default function LoginForm() {
             disabled={isSubmitting}
           >
             {isSubmitting && <span className="loading loading-spinner"></span>}
-            Log In
+            Create Account
           </button>
         </div>
 
         <div className="text-center mt-4 text-sm">
           <p>
-            Don't have an account?{" "}
-            <Link to="/signup" className="link link-primary">
-              Sign Up
+            Already have an account?{" "}
+            <Link to="/login" className="link link-primary">
+              Log In
             </Link>
           </p>
         </div>

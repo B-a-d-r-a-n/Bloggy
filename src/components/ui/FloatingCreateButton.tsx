@@ -2,20 +2,18 @@
 
 import { Link } from "@tanstack/react-router";
 import { PlusIcon } from "@heroicons/react/24/solid"; // Or PlusCircleIcon
+import { useAuth } from "../../hooks/useAuth";
 
 // --- Placeholder Auth Hook ---
 // In a real app, you'd import this from your actual hooks file.
-const useAuth = () => {
-  const isAuthenticated = true; // <-- CHANGE to false to hide the button
-  return { isAuthenticated };
-};
+
 // --- End Placeholder Hook ---
 
 export function FloatingCreateButton() {
-  const { isAuthenticated } = useAuth();
+  const { user } = useAuth();
 
   // If the user is not authenticated, render nothing.
-  if (!isAuthenticated) {
+  if (!user) {
     return null;
   }
 

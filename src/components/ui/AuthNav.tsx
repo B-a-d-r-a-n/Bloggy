@@ -17,20 +17,29 @@ export function AuthNav() {
       </>
     );
   }
-
+  const initials = user?.name
+    .split(" ")
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join("");
   return (
     <div className="dropdown dropdown-end">
       <div
         tabIndex={0}
         role="button"
-        className="btn btn-ghost btn-circle avatar"
+        className="btn btn-ghost btn-circle avatar placeholder"
       >
-        <div className="w-10 rounded-full">
-          <img
-            alt="User Avatar"
-            src={user.avatarUrl || "/default-avatar.png"}
-          />
-        </div>
+        {user.avatarUrl ? (
+          // If there IS an avatar, show it
+          <div className="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+            <img alt="User Avatar" src={user.avatarUrl} />
+          </div>
+        ) : (
+          // If there is NO avatar, show the placeholder with initials
+          <div className="bg-neutral text-neutral-content rounded-full w-10 ring ring-primary ring-offset-base-100 ring-offset-2">
+            <span className="text-xl">{initials}</span>
+          </div>
+        )}
       </div>
       <ul
         tabIndex={0}
