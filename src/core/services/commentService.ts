@@ -33,13 +33,13 @@ class CommentService {
     );
     return response.data;
   }
-  async deleteComment(commentId: string): Promise<void> {
+  async deleteComment(commentId: string) {
     console.log(
       "Service is about to call api.delete for commentId:",
       commentId
     );
     await api.delete(`/api/v1/comments/${commentId}`);
-    console.log("Service call to api.delete completed."); 
+    console.log("Service call to api.delete completed.");
   }
 }
 export default new CommentService();
