@@ -51,28 +51,31 @@ export default function CommentItem({ comment, articleId }: CommentItemProps) {
           </span>
         </div>
         <p className="py-2">{comment.text}</p>
-        <div className="flex items-center gap-2">
-          <button
-            className="btn btn-xs btn-ghost"
-            onClick={() => setIsReplying(!isReplying)}
-          >
-            {isReplying ? "Cancel" : "Reply"}
-          </button>
-          {}
-          {isOwner && (
+        {user && (
+          <div className="flex items-center gap-2">
             <button
-              className="btn btn-xs btn-ghost text-error"
-              onClick={handleDelete}
-              disabled={deleteCommentMutation.isPending}
+              className="btn btn-xs btn-ghost"
+              onClick={() => setIsReplying(!isReplying)}
             >
-              {deleteCommentMutation.isPending ? (
-                <span className="loading loading-spinner loading-xs"></span>
-              ) : (
-                "Delete"
-              )}
+              {isReplying ? "Cancel" : "Reply"}
             </button>
-          )}
-        </div>
+            {}
+            {isOwner && (
+              <button
+                className="btn btn-xs btn-ghost text-error"
+                onClick={handleDelete}
+                disabled={deleteCommentMutation.isPending}
+              >
+                {deleteCommentMutation.isPending ? (
+                  <span className="loading loading-spinner loading-xs"></span>
+                ) : (
+                  "Delete"
+                )}
+              </button>
+            )}
+          </div>
+        )}
+
         {isReplying && (
           <div className="mt-4">
             <CommentForm
