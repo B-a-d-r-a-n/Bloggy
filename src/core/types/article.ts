@@ -5,40 +5,43 @@ import type { Tag } from "./tag";
 export interface ArticleListItem {
   _id: string;
   title: string;
-  summary: string; 
-  coverImageUrl?: string; 
+  summary: string;
+  coverImageUrl?: string;
   author: Pick<User, "_id" | "name" | "avatarUrl">;
   category: Pick<Category, "_id" | "name">;
-  readTimeInMinutes: number; 
+  readTimeInMinutes: number;
   tags?: { _id: string; name: string }[];
-  commentCount: number; 
+  totalCommentCount: number;
   createdAt: string;
   updatedAt: string;
-  isOwner?: boolean; 
+  isOwner?: boolean;
+  starsCount: number;
 }
 export interface ArticleFull {
   id: string;
   _id: string;
   title: string;
   summary: string;
-  content: string; 
+  content: string;
   coverImageUrl?: string;
   author: Pick<User, "_id" | "name" | "avatarUrl">;
-  category: Category; 
+  category: Category;
   readTimeInMinutes: number;
-  tags?: Tag[]; 
-  comments?: PopulatedComment[]; 
-  commentCount: number; 
+  tags?: Tag[];
+  comments?: PopulatedComment[];
+  totalCommentCount: number;
   createdAt: string;
   updatedAt: string;
-  isOwner?: boolean; 
+  isOwner?: boolean;
+  starredBy: string[];
+  starsCount: number;
 }
 export interface CreateArticlePayload {
   title: string;
   summary: string;
   content: string;
-  category: string; 
-  tags?: string[]; 
-  coverImage?: File; 
+  category: string;
+  tags?: string[];
+  coverImage?: File;
 }
 export type UpdateArticlePayload = Partial<CreateArticlePayload>;

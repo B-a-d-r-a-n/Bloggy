@@ -3,6 +3,12 @@ import type {
   PaginatedCommentsResponse,
   AddCommentResponse,
 } from "../types/comment";
+interface UpdateCommentResponse {
+  status: "success";
+  data: {
+    comment: Comment;
+  };
+}
 class CommentService {
   async fetchComments(
     articleId: string,
@@ -29,6 +35,16 @@ class CommentService {
   ): Promise<AddCommentResponse> {
     const response = await api.post<AddCommentResponse>(
       `/api/v1/comments/${commentId}/replies`,
+      { text }
+    );
+    return response.data;
+  }
+  async updateComment(
+    commentId: string,
+    text: string
+  ): Promise<UpdateCommentResponse> {
+    const response = await api.patch<UpdateCommentResponse>(
+      `/api/v1/comments/${commentId}`,
       { text }
     );
     return response.data;

@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { PlusIcon } from "@heroicons/react/24/solid";
-import { useAuth } from "../../hooks/useAuth";
+import { useCurrentUser } from "../../features/auth/queries";
 export function FloatingCreateButton() {
-  const { user } = useAuth();
+  const { data: user } = useCurrentUser();
   if (!user) {
     return null;
   }

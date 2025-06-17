@@ -1,14 +1,15 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import SignupForm from "../features/auth/components/SignupForm";
+import { authKeys } from "../features/auth/queries";
 export const Route = createFileRoute("/signup")({
-  beforeLoad: ({ context, location }) => {
-    if (context.auth.isAuthenticated()) {
+  beforeLoad: ({ context }) => {
+    const user = context.queryClient.getQueryData(authKeys.me);
+
+    if (user) {
+      console.log("User is already logged in, redirecting from /signup");
       throw redirect({
         to: "/",
         replace: true,
-        search: {
-          redirect: location.href,
-        },
       });
     }
   },
