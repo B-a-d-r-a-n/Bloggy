@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const AVAILABLE_THEMES = ["garden", "dracula"];
+const AVAILABLE_THEMES = ["garden", "sunset"];
 
 export const useTheme = () => {
   const [theme, setTheme] = useState(
