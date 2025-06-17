@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { Link } from "@tanstack/react-router"; // <-- Import the Link component
 import type { PopulatedComment } from "../../../core/types/comment";
 import { usePostReply, useDeleteComment, useUpdateComment } from "../queries";
 import CommentForm from "./CommentForm";
 import { getUserAvatar } from "../../../lib/utils";
 import { useCurrentUser } from "../../auth/queries";
+import { useState } from "react";
 
 interface CommentItemProps {
   comment: PopulatedComment;
@@ -13,9 +14,8 @@ interface CommentItemProps {
 export default function CommentItem({ comment, articleId }: CommentItemProps) {
   const { data: user } = useCurrentUser();
   const [isReplying, setIsReplying] = useState(false);
-  const [isEditing, setIsEditing] = useState(false); // <-- New state for edit mode
+  const [isEditing, setIsEditing] = useState(false);
 
-  // Initialize all mutation hooks
   const postReplyMutation = usePostReply(articleId);
   const deleteCommentMutation = useDeleteComment(articleId);
   const updateCommentMutation = useUpdateComment(articleId);
@@ -42,31 +42,39 @@ export default function CommentItem({ comment, articleId }: CommentItemProps) {
     );
   };
 
+  // Defensive check for missing author data
+  if (!comment.author) return null;
+
   return (
-    <div className="flex gap-3">
-      {/* Avatar */}
-      <div className="avatar flex-shrink-0">
+    <div className="flex gap-3 items-start">
+      <Link
+        to="/profile/$userId"
+        params={{ userId: comment.author._id }}
+        className="avatar flex-shrink-0"
+      >
         <div className="w-10 h-10 rounded-full">
           <img
             src={getUserAvatar(comment.author.name, comment.author.avatarUrl)}
             alt={comment.author.name}
           />
         </div>
-      </div>
+      </Link>
 
-      {/* Main Content */}
       <div className="flex-1">
         <div className="bg-base-200 rounded-lg px-4 py-2">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-base-content">
+            <Link
+              to="/profile/$userId"
+              params={{ userId: comment.author._id }}
+              className="font-bold text-base-content link link-hover"
+            >
               {comment.author.name}
-            </span>
+            </Link>
             <span className="text-xs text-base-content/60">
               • {new Date(comment.createdAt).toLocaleDateString()}
             </span>
           </div>
 
-          {/* --- CONDITIONAL RENDER: Display Text or Edit Form --- */}
           {isEditing ? (
             <div className="mt-2">
               <CommentForm
@@ -74,6 +82,7 @@ export default function CommentItem({ comment, articleId }: CommentItemProps) {
                 isSubmitting={updateCommentMutation.isPending}
                 initialText={comment.text}
                 submitLabel="Save"
+                onCancel={() => setIsEditing(false)}
               />
             </div>
           ) : (
@@ -83,11 +92,10 @@ export default function CommentItem({ comment, articleId }: CommentItemProps) {
           )}
         </div>
 
-        {/* --- ACTIONS: Reply, Edit, Delete --- */}
         {user && !isEditing && (
           <div className="flex items-center gap-2 text-xs font-medium text-base-content/60 pl-2 pt-1">
             <button
-              className="hover:text-primary cursor-pointer"
+              className="hover:text-primary"
               onClick={() => setIsReplying(!isReplying)}
             >
               {isReplying ? "Cancel" : "Reply"}
@@ -96,36 +104,35 @@ export default function CommentItem({ comment, articleId }: CommentItemProps) {
               <>
                 <span>•</span>
                 <button
-                  className="hover:text-primary cursor-pointer"
+                  className="hover:text-primary"
                   onClick={() => setIsEditing(true)}
                 >
                   Edit
                 </button>
                 <span>•</span>
                 <button
-                  className="hover:text-error cursor-pointer"
+                  className="hover:text-error"
                   onClick={handleDelete}
                   disabled={deleteCommentMutation.isPending}
                 >
-                  Delete
+                  {deleteCommentMutation.isPending ? "Deleting..." : "Delete"}
                 </button>
               </>
             )}
           </div>
         )}
 
-        {/* Reply Form */}
         {isReplying && (
           <div className="mt-4">
             <CommentForm
               onSubmit={handleReplySubmit}
               isSubmitting={postReplyMutation.isPending}
               submitLabel="Post Reply"
+              onCancel={() => setIsReplying(false)}
             />
           </div>
         )}
 
-        {/* Render Replies Recursively */}
         {comment.replies && comment.replies.length > 0 && (
           <div className="mt-4 pl-6 border-l-2 border-base-300 space-y-4">
             {comment.replies.map((reply) => (
