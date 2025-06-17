@@ -90,7 +90,7 @@ function AboutPage() {
         {/* --- 4. Call to Action (CTA) Section --- */}
         {/* We only render this entire section if the user is NOT logged in */}
         {!user && (
-          <section className="text-center bg-base-200 p-8 rounded-lg">
+          <section className="text-center bg-base-200 p-8 md:p-12 rounded-lg">
             <h2 className="text-3xl font-bold">Join Our Community</h2>
             <p className="max-w-xl mx-auto mt-4 text-base-content/80">
               Ready to share your voice or discover your next favorite author?
