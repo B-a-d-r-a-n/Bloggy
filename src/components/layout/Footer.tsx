@@ -22,7 +22,7 @@ export default function Footer() {
         {/* --- Copyright Section --- */}
         <aside className="text-sm text-base-content/70">
           <p>
-            Copyright © {currentYear} - All right reserved by Mohamed Badran
+            Copyright © {currentYear} - All rights reserved by Mohamed Badran
           </p>
         </aside>
       </div>
