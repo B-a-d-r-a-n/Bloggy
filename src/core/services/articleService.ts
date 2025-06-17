@@ -1,11 +1,49 @@
 import { api } from "../../lib/api";
 import type { PaginatedArticlesResponse } from "../types/api";
 import type { ArticleFull } from "../types/article";
+interface FetchArticlesParams {
+  q?: string;
+  category?: string;
+  author?: string;
+  page?: number;
+  sort?: string;
+}
+
 class ArticleService {
-  async fetchArticles(page: number = 1): Promise<PaginatedArticlesResponse> {
+  async fetchArticles(
+    params: FetchArticlesParams = {}
+  ): Promise<PaginatedArticlesResponse> {
+    // Create an object to hold only the defined query parameters.
+    const queryParams: Record<string, string> = {
+      page: String(params.page || 1),
+      limit: "10", // Keep a consistent limit
+    };
+
+    // Conditionally add other parameters if they exist.
+
+    if (params.q) {
+      queryParams.q = params.q;
+    }
+    if (params.category) {
+      queryParams.category = params.category;
+    }
+    if (params.author) {
+      queryParams.author = params.author;
+    }
+    if (params.sort) {
+      let sortValue = "-createdAt";
+      if (params.sort === "oldest") sortValue = "createdAt";
+      if (params.sort === "stars") sortValue = "-starsCount";
+      queryParams.sort = sortValue;
+    }
+
+    // Build the query string from the object.
+    const queryString = new URLSearchParams(queryParams).toString();
+
     const response = await api.get<PaginatedArticlesResponse>(
-      `/api/v1/articles?page=${page}&limit=10`
+      `/api/v1/articles?${queryString}`
     );
+
     return response.data;
   }
   async fetchArticleById(articleId: string): Promise<ArticleFull> {

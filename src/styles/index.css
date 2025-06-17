@@ -1,6 +1,161 @@
 @import "tailwindcss";
 @plugin "daisyui" {
   themes:
-    light --default,
-    dracula --prefersdark;
+    garden --default,
+    sunset --prefersdark;
+}
+/* Base toast styles */
+.toast {
+  background-color: hsl(var(--b2));
+  color: hsl(var(--bc));
+  border-radius: var(--rounded-box, 1rem);
+  padding: 1rem 1.5rem;
+  border: 1px solid hsl(var(--b3));
+  box-shadow: var(--shadow-lg);
+  transition: all 0.2s ease-in-out;
+}
+
+/* Garden theme (light mode) specific styles */
+[data-theme="garden"] .toast {
+  background-color: hsl(0 0% 98%);
+  color: hsl(155 27% 20%); /* Darker green text for garden theme */
+  border-color: hsl(155 27% 85%);
+  box-shadow: 0 4px 6px -1px rgba(155, 187, 89, 0.1);
+}
+
+/* Sunset theme (dark mode) specific styles */
+[data-theme="sunset"] .toast {
+  background-color: hsl(14 100% 8%); /* Deep sunset background */
+  color: hsl(39 100% 85%); /* Warm sunset text */
+  border-color: hsl(14 100% 15%);
+  box-shadow: 0 4px 6px -1px rgba(255, 87, 34, 0.2);
+}
+
+/* Toast type variations that adapt to theme */
+.toast-success {
+  background-color: hsl(var(--su) / 0.1);
+  border-color: hsl(var(--su) / 0.3);
+  color: hsl(var(--su-content, var(--bc)));
+}
+
+.toast-error {
+  background-color: hsl(var(--er) / 0.1);
+  border-color: hsl(var(--er) / 0.3);
+  color: hsl(var(--er-content, var(--bc)));
+}
+
+.toast-warning {
+  background-color: hsl(var(--wa) / 0.1);
+  border-color: hsl(var(--wa) / 0.3);
+  color: hsl(var(--wa-content, var(--bc)));
+}
+
+.toast-info {
+  background-color: hsl(var(--in) / 0.1);
+  border-color: hsl(var(--in) / 0.3);
+  color: hsl(var(--in-content, var(--bc)));
+}
+
+/* Garden theme toast type variations */
+[data-theme="garden"] .toast-success {
+  background-color: hsl(155 55% 92%); /* Light green background */
+  border-color: hsl(155 55% 75%);
+  color: hsl(155 55% 25%); /* Dark green text */
+}
+
+[data-theme="garden"] .toast-error {
+  background-color: hsl(0 65% 92%); /* Light red background */
+  border-color: hsl(0 65% 75%);
+  color: hsl(0 65% 30%); /* Dark red text */
+}
+
+[data-theme="garden"] .toast-warning {
+  background-color: hsl(45 85% 92%); /* Light yellow background */
+  border-color: hsl(45 85% 75%);
+  color: hsl(45 85% 25%); /* Dark yellow text */
+}
+
+[data-theme="garden"] .toast-info {
+  background-color: hsl(200 75% 92%); /* Light blue background */
+  border-color: hsl(200 75% 75%);
+  color: hsl(200 75% 25%); /* Dark blue text */
+}
+
+/* Sunset theme toast type variations */
+[data-theme="sunset"] .toast-success {
+  background-color: hsl(155 55% 15%); /* Dark green background */
+  border-color: hsl(155 55% 30%);
+  color: hsl(155 55% 80%); /* Light green text */
+}
+
+[data-theme="sunset"] .toast-error {
+  background-color: hsl(14 100% 15%); /* Deep sunset red */
+  border-color: hsl(14 100% 30%);
+  color: hsl(14 100% 85%); /* Light orange text */
+}
+
+[data-theme="sunset"] .toast-warning {
+  background-color: hsl(39 100% 15%); /* Deep sunset yellow */
+  border-color: hsl(39 100% 30%);
+  color: hsl(39 100% 85%); /* Light yellow text */
+}
+
+[data-theme="sunset"] .toast-info {
+  background-color: hsl(200 75% 15%); /* Dark blue background */
+  border-color: hsl(200 75% 30%);
+  color: hsl(200 75% 80%); /* Light blue text */
+}
+
+/* Icons with theme awareness */
+.toast-success-icon {
+  color: hsl(var(--su));
+}
+
+.toast-error-icon {
+  color: hsl(var(--er));
+}
+
+.toast-warning-icon {
+  color: hsl(var(--wa));
+}
+
+.toast-info-icon {
+  color: hsl(var(--in));
+}
+
+/* Garden theme icon colors */
+[data-theme="garden"] .toast-success-icon {
+  color: hsl(155 55% 35%);
+}
+
+[data-theme="garden"] .toast-error-icon {
+  color: hsl(0 65% 40%);
+}
+
+[data-theme="garden"] .toast-warning-icon {
+  color: hsl(45 85% 35%);
+}
+
+[data-theme="garden"] .toast-info-icon {
+  color: hsl(200 75% 35%);
+}
+
+/* Sunset theme icon colors */
+[data-theme="sunset"] .toast-success-icon {
+  color: hsl(155 55% 70%);
+}
+
+[data-theme="sunset"] .toast-error-icon {
+  color: hsl(14 100% 75%);
+}
+
+[data-theme="sunset"] .toast-warning-icon {
+  color: hsl(39 100% 75%);
+}
+
+[data-theme="sunset"] .toast-info-icon {
+  color: hsl(200 75% 70%);
+}
+#nprogress .bar {
+  background: var(--color-primary) !important;
 }

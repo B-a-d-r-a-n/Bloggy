@@ -1,16 +1,18 @@
-import { useState } from "react"; // Import React for useState
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { z } from "zod";
 import ArticleForm from "../../features/articles/components/ArticleForm";
 import {
-  useGetArticleById,
   useCreateArticle,
   useUpdateArticle,
+  articleKeys,
 } from "../../features/articles/queries";
+import { authKeys } from "../../features/auth/queries";
+import articleService from "../../core/services/articleService";
+import type { ArticleFull } from "../../core/types/article";
 
 const articleActionSearchSchema = z
   .object({
-    mode: z.enum(["create", "edit"]).default("create"),
+    mode: z.enum(["create", "edit"]),
     articleId: z.string().optional(),
   })
   .refine((data) => (data.mode === "edit" ? !!data.articleId : true), {
@@ -19,123 +21,87 @@ const articleActionSearchSchema = z
 
 export const Route = createFileRoute("/articles/action")({
   validateSearch: (search) => articleActionSearchSchema.parse(search),
+  beforeLoad: async ({ context, location }) => {
+    const user = await context.queryClient.fetchQuery({
+      queryKey: authKeys.me,
+    });
+    if (!user) {
+      throw redirect({ to: "/login", search: { redirect: location.href } });
+    }
+  },
+
+  loaderDeps: ({ search }) => ({
+    mode: search.mode,
+    articleId: search.articleId,
+  }),
+  loader: ({ context, deps }) => {
+    if (deps.mode === "edit") {
+      return context.queryClient.ensureQueryData({
+        queryKey: articleKeys.detail(deps.articleId!),
+        queryFn: () => articleService.fetchArticleById(deps.articleId!),
+      });
+    }
+    return null;
+  },
+
   component: ArticleActionPage,
 });
-
 function ArticleActionPage() {
   const navigate = useNavigate();
+
   const { mode, articleId } = Route.useSearch();
 
-  // 1. State for handling API errors from mutations
-  const [apiError, setApiError] = useState<string | null>(null);
-
-  // The type of `articleId` is narrowed to `string` inside this block
-  const isEditMode = mode === "edit" && !!articleId;
-
-  const {
-    data: initialData,
-    isLoading: isLoadingArticle,
-    isError: isArticleError,
-  } = useGetArticleById(
-    articleId!, // We can pass articleId directly
-    { enabled: isEditMode } // `enabled` handles the undefined/null case safely
-  );
+  const initialData = Route.useLoaderData() as ArticleFull | null;
 
   const createMutation = useCreateArticle();
   const updateMutation = useUpdateArticle();
 
   const handleSubmit = (formData: FormData) => {
-    setApiError(null); // Clear previous errors on a new submission
-
-    if (isEditMode) {
+    if (mode === "edit" && articleId) {
       updateMutation.mutate(
         { articleId, formData },
         {
-          onSuccess: (data) => {
-            // 2. Robust redirect logic
-            const id = data.id || data._id; // Prioritize virtual `id`, fall back to `_id`
+          onSuccess: (data) =>
             navigate({
               to: "/articles/$articleId",
-              params: { articleId: id },
+              params: { articleId: data._id },
               replace: true,
-            });
-          },
-          // 3. Handle errors from the mutation
-          onError: (error) => {
-            setApiError(error.message || "Failed to update the article.");
-          },
+            }),
         }
       );
     } else {
       createMutation.mutate(formData, {
-        onSuccess: (data) => {
-          // 2. Robust redirect logic
-          const id = data.id || data._id;
+        onSuccess: (data) =>
           navigate({
             to: "/articles/$articleId",
-            params: { articleId: id },
+            params: { articleId: data._id },
             replace: true,
-          });
-        },
-        // 3. Handle errors from the mutation
-        onError: (error) => {
-          setApiError(error.message || "Failed to publish the article.");
-        },
+          }),
       });
     }
   };
 
-  // 4. Refined loading and error handling for EDIT mode
-  if (isEditMode) {
-    if (isLoadingArticle) {
-      return (
-        <div className="py-12 text-center">
-          <span className="loading loading-lg loading-spinner"></span>
-          <p>Loading article for editing...</p>
-        </div>
-      );
-    }
+  // You can still use a loading state from the route itself for the initial data fetch
+  const { status } = Route.useMatch();
+  const isInitialLoading = status === "pending";
 
-    if (isArticleError || !initialData) {
-      return (
-        <div className="py-12">
-          <div role="alert" className="alert alert-error max-w-2xl mx-auto">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="stroke-current shrink-0 h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span>
-              Error! Could not load article data. Please check the URL and try
-              again.
-            </span>
-          </div>
-        </div>
-      );
-    }
+  if (isInitialLoading) {
+    return (
+      <div className="py-12 text-center">
+        <span className="loading loading-lg loading-spinner"></span>
+      </div>
+    );
   }
+
+  const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
   return (
     <div className="py-12">
-      {/* 5. Display the API error message right above the form */}
-      {apiError && (
-        <div role="alert" className="alert alert-error max-w-4xl mx-auto mb-6">
-          <span>{apiError}</span>
-        </div>
-      )}
       <ArticleForm
         mode={mode}
-        initialData={initialData}
+        initialData={mode === "edit" ? initialData! : undefined}
         onSubmit={handleSubmit}
-        isSubmitting={createMutation.isPending || updateMutation.isPending}
+        isSubmitting={isSubmitting}
       />
     </div>
   );

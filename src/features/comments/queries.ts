@@ -45,6 +45,19 @@ export const usePostReply = (articleId: string) => {
     },
   });
 };
+export const useUpdateComment = (articleId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (variables: { commentId: string; text: string }) =>
+      commentService.updateComment(variables.commentId, variables.text),
+
+    onSuccess: () => {
+      // invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: commentKeys.lists(articleId) });
+    },
+  });
+};
 export const useDeleteComment = (articleId: string) => {
   const queryClient = useQueryClient();
   return useMutation({

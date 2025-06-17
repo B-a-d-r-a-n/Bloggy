@@ -1,45 +1,44 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { routeTree } from "./routeTree.gen";
-import authService from "./core/services/authService";
-import { authUtils } from "./lib/authUtils";
 import "./styles/index.css";
-import { queryClient, type RouterContext } from "./router";
+import "nprogress/nprogress.css";
+import { api } from "./lib/api";
+
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,
+      retry: 1,
+    },
+  },
+});
+const token = localStorage.getItem("access_token");
+if (token) {
+  api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+}
+
 const router = createRouter({
   routeTree,
   context: {
     queryClient,
-    auth: {
-      isAuthenticated: authUtils.isAuthenticated,
-    },
-  } satisfies RouterContext,
-  defaultPreload: "intent", 
+  },
+  defaultPreload: "intent",
 });
+
 declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
   }
 }
-async function startApp() {
-  try {
-    const response = await authService.refreshToken();
-    authUtils.setToken(response.accessToken);
-    console.log("Session restored successfully.");
-  } catch (error) {
-    console.log("No active session found.", error);
-  }
-  const rootElement = document.getElementById("root")!;
-  if (!rootElement.innerHTML) {
-    const root = ReactDOM.createRoot(rootElement);
-    root.render(
-      <React.StrictMode>
-        <QueryClientProvider client={queryClient}>
-          <RouterProvider router={router} />
-        </QueryClientProvider>
-      </React.StrictMode>
-    );
-  }
+
+const rootElement = document.getElementById("root")!;
+if (!rootElement.innerHTML) {
+  const root = ReactDOM.createRoot(rootElement);
+  root.render(
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  );
 }
-startApp();

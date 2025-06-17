@@ -1,8 +1,23 @@
 import { Link } from "@tanstack/react-router";
-import { useAuth } from "../../hooks/useAuth";
 import { getUserAvatar } from "../../lib/utils";
+import { useCurrentUser, useLogout } from "../../features/auth/queries";
+
+import toast from "react-hot-toast";
+import { api } from "../../lib/api";
 export function AuthNav() {
-  const { user, logout } = useAuth();
+  const { data: user } = useCurrentUser(); // <-- The new hook
+  const logout = useLogout();
+  const handleLogout = async () => {
+    try {
+      await logout();
+      delete api.defaults.headers.common["Authorization"];
+      localStorage.removeItem("access_token"); // 👈 remove on logout
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // You might want to show a toast notification here
+      toast.error("Logout failed, please try again");
+    }
+  };
   if (!user) {
     return (
       <>
@@ -38,10 +53,12 @@ export function AuthNav() {
           <span>Signed in as {user.name}</span>
         </div>
         <li>
-          <Link to="/profile/dashboard">Profile</Link>
+          <Link params={{ userId: user._id }} to={`/profile/$userId`}>
+            Profile
+          </Link>
         </li>
         <li>
-          <button onClick={logout}>Logout</button>
+          <button onClick={handleLogout}>Logout</button>
         </li>
       </ul>
     </div>

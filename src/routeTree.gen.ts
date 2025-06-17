@@ -14,9 +14,9 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as SignupImport } from './routes/signup'
 import { Route as LoginImport } from './routes/login'
 import { Route as AboutImport } from './routes/about'
+import { Route as SplatImport } from './routes/$'
 import { Route as IndexImport } from './routes/index'
-import { Route as ArticlesIndexImport } from './routes/articles/index'
-import { Route as ProfileDashboardImport } from './routes/profile/dashboard'
+import { Route as ProfileUserIdImport } from './routes/profile/$userId'
 import { Route as ArticlesActionImport } from './routes/articles/action'
 import { Route as ArticlesArticleIdImport } from './routes/articles/$articleId'
 
@@ -40,21 +40,21 @@ const AboutRoute = AboutImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const SplatRoute = SplatImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
 } as any)
 
-const ArticlesIndexRoute = ArticlesIndexImport.update({
-  id: '/articles/',
-  path: '/articles/',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const ProfileDashboardRoute = ProfileDashboardImport.update({
-  id: '/profile/dashboard',
-  path: '/profile/dashboard',
+const ProfileUserIdRoute = ProfileUserIdImport.update({
+  id: '/profile/$userId',
+  path: '/profile/$userId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -79,6 +79,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/$': {
+      id: '/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof SplatImport
       parentRoute: typeof rootRoute
     }
     '/about': {
@@ -116,18 +123,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArticlesActionImport
       parentRoute: typeof rootRoute
     }
-    '/profile/dashboard': {
-      id: '/profile/dashboard'
-      path: '/profile/dashboard'
-      fullPath: '/profile/dashboard'
-      preLoaderRoute: typeof ProfileDashboardImport
-      parentRoute: typeof rootRoute
-    }
-    '/articles/': {
-      id: '/articles/'
-      path: '/articles'
-      fullPath: '/articles'
-      preLoaderRoute: typeof ArticlesIndexImport
+    '/profile/$userId': {
+      id: '/profile/$userId'
+      path: '/profile/$userId'
+      fullPath: '/profile/$userId'
+      preLoaderRoute: typeof ProfileUserIdImport
       parentRoute: typeof rootRoute
     }
   }
@@ -137,92 +137,92 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/articles/$articleId': typeof ArticlesArticleIdRoute
   '/articles/action': typeof ArticlesActionRoute
-  '/profile/dashboard': typeof ProfileDashboardRoute
-  '/articles': typeof ArticlesIndexRoute
+  '/profile/$userId': typeof ProfileUserIdRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/articles/$articleId': typeof ArticlesArticleIdRoute
   '/articles/action': typeof ArticlesActionRoute
-  '/profile/dashboard': typeof ProfileDashboardRoute
-  '/articles': typeof ArticlesIndexRoute
+  '/profile/$userId': typeof ProfileUserIdRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/articles/$articleId': typeof ArticlesArticleIdRoute
   '/articles/action': typeof ArticlesActionRoute
-  '/profile/dashboard': typeof ProfileDashboardRoute
-  '/articles/': typeof ArticlesIndexRoute
+  '/profile/$userId': typeof ProfileUserIdRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/$'
     | '/about'
     | '/login'
     | '/signup'
     | '/articles/$articleId'
     | '/articles/action'
-    | '/profile/dashboard'
-    | '/articles'
+    | '/profile/$userId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/$'
     | '/about'
     | '/login'
     | '/signup'
     | '/articles/$articleId'
     | '/articles/action'
-    | '/profile/dashboard'
-    | '/articles'
+    | '/profile/$userId'
   id:
     | '__root__'
     | '/'
+    | '/$'
     | '/about'
     | '/login'
     | '/signup'
     | '/articles/$articleId'
     | '/articles/action'
-    | '/profile/dashboard'
-    | '/articles/'
+    | '/profile/$userId'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SplatRoute: typeof SplatRoute
   AboutRoute: typeof AboutRoute
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
   ArticlesArticleIdRoute: typeof ArticlesArticleIdRoute
   ArticlesActionRoute: typeof ArticlesActionRoute
-  ProfileDashboardRoute: typeof ProfileDashboardRoute
-  ArticlesIndexRoute: typeof ArticlesIndexRoute
+  ProfileUserIdRoute: typeof ProfileUserIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SplatRoute: SplatRoute,
   AboutRoute: AboutRoute,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
   ArticlesArticleIdRoute: ArticlesArticleIdRoute,
   ArticlesActionRoute: ArticlesActionRoute,
-  ProfileDashboardRoute: ProfileDashboardRoute,
-  ArticlesIndexRoute: ArticlesIndexRoute,
+  ProfileUserIdRoute: ProfileUserIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -236,17 +236,20 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/$",
         "/about",
         "/login",
         "/signup",
         "/articles/$articleId",
         "/articles/action",
-        "/profile/dashboard",
-        "/articles/"
+        "/profile/$userId"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/$": {
+      "filePath": "$.tsx"
     },
     "/about": {
       "filePath": "about.tsx"
@@ -263,11 +266,8 @@ export const routeTree = rootRoute
     "/articles/action": {
       "filePath": "articles/action.tsx"
     },
-    "/profile/dashboard": {
-      "filePath": "profile/dashboard.tsx"
-    },
-    "/articles/": {
-      "filePath": "articles/index.tsx"
+    "/profile/$userId": {
+      "filePath": "profile/$userId.tsx"
     }
   }
 }

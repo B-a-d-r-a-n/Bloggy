@@ -1,33 +1,71 @@
-import type { ArticleFull } from "../../../core/types/article";
-import { CalendarDaysIcon, ClockIcon } from "@heroicons/react/24/outline";
-import DOMPurify from "dompurify";
 import { getUserAvatar } from "../../../lib/utils";
+import {
+  ClockIcon,
+  ChatBubbleOvalLeftEllipsisIcon,
+} from "@heroicons/react/24/outline";
+import ArticleActions from "./ArticleActions";
+import DOMPurify from "dompurify";
+import type { ArticleFull } from "../../../core/types/article";
+import { Link } from "@tanstack/react-router";
+import { marked } from "marked";
+import StarButton from "./StarButton";
+
 interface ArticleDetailDisplayProps {
   article: ArticleFull;
 }
+
 export default function ArticleDetailDisplay({
   article,
 }: ArticleDetailDisplayProps) {
-  const cleanHtml = DOMPurify.sanitize(article.content);
+  const rawHtml = marked.parse(article.content) as string;
+  const cleanHtml = DOMPurify.sanitize(rawHtml);
+
+  // Helper function to scroll to the comments section
+  const scrollToComments = () => {
+    document
+      .getElementById("comment-section")
+      ?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <article className="max-w-4xl mx-auto">
-      <div className="text-center mb-4">
+      {/* Header Section */}
+      <header className="text-center mb-8">
         {article.category && (
-          <div className="badge badge-primary badge-lg">
+          // --- CHANGE: No longer a Link ---
+          <div className="badge badge-primary font-semibold mb-4 text-sm py-3 px-4">
             {article.category.name}
           </div>
         )}
-      </div>
-      <h1 className="text-4xl lg:text-5xl font-extrabold text-center text-base-content mb-6 break-all">
-        {article.title}
-      </h1>
-      <p className="text-lg lg:text-xl text-center text-base-content/70 mb-8 max-w-3xl mx-auto break-all">
-        {article.summary}
-      </p>
-      <div className="flex flex-col sm:flex-row justify-center items-center gap-x-6 gap-y-4 mb-8 border-y border-base-300 py-4">
-        <div className="flex items-center gap-3">
-          <div className="avatar">
-            <div className="w-12 h-12 rounded-full">
+        <h1 className="text-4xl lg:text-5xl font-extrabold text-base-content leading-tight break-words">
+          {article.title}
+        </h1>
+        <p className="text-lg lg:text-xl text-base-content/70 mt-4 max-w-3xl mx-auto">
+          {article.summary}
+        </p>
+      </header>
+      {/* Cover Image */}
+      {article.coverImageUrl && (
+        <figure className="mb-8 lg:mb-12 rounded-lg overflow-hidden shadow-lg">
+          <div className="aspect-video bg-base-300">
+            <img
+              src={article.coverImageUrl}
+              alt={`Cover for ${article.title}`}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </figure>
+      )}
+      {/* Author and Meta Info Bar */}
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 my-8 border-y border-base-300 py-4">
+        {/* Author Info (Remains a Link) */}
+        <div className="flex items-center gap-4">
+          <Link
+            params={{ userId: article.author._id }}
+            to={`/profile/$userId`}
+            className="avatar"
+          >
+            <div className="w-14 h-14 rounded-full">
               <img
                 src={getUserAvatar(
                   article.author.name,
@@ -36,57 +74,78 @@ export default function ArticleDetailDisplay({
                 alt={article.author.name}
               />
             </div>
-          </div>
+          </Link>
           <div>
-            <p className="font-bold text-base-content">{article.author.name}</p>
-            <p className="text-sm text-base-content/60">Author</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-x-6 gap-y-2 text-base-content/70">
-          <div className="flex items-center gap-2">
-            <CalendarDaysIcon className="w-5 h-5" />
-            <span className="text-sm">
+            <Link
+              params={{ userId: article.author._id }}
+              to={`/profile/$userId`}
+              className="font-bold text-base-content link link-hover"
+            >
+              {article.author.name}
+            </Link>
+            <p className="text-sm text-base-content/60">
+              Published on{" "}
               {new Date(article.createdAt).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "long",
-                day: "numeric",
               })}
-            </span>
+            </p>
           </div>
-          <div className="flex items-center gap-2">
+        </div>
+
+        {/* Meta Info: Read Time & Comment Count */}
+        <div className="flex items-center gap-x-6 text-base-content/70">
+          <div className="flex items-center gap-2" title="Read time">
             <ClockIcon className="w-5 h-5" />
             <span className="text-sm">
               {article.readTimeInMinutes} min read
             </span>
           </div>
+          {/* --- Comment Count --- */}
+          <button
+            onClick={scrollToComments}
+            className="flex items-center gap-2 hover:text-primary transition-colors"
+            title="Scroll to comments"
+          >
+            <ChatBubbleOvalLeftEllipsisIcon className="w-5 h-5" />
+            <span className="text-sm">
+              {article.totalCommentCount} comments
+            </span>
+          </button>
         </div>
+        <StarButton
+          articleId={article._id}
+          starredBy={article.starredBy}
+          starsCount={article.starsCount}
+        />
       </div>
-      {article.coverImageUrl && (
-        <figure className="mb-8 rounded-lg overflow-hidden shadow-lg">
-          <img
-            src={article.coverImageUrl}
-            alt={`Cover for ${article.title}`}
-            className="w-full h-auto object-cover"
-          />
-        </figure>
-      )}
+
+      {/* Article Content */}
       <div
         className="prose lg:prose-xl max-w-none mx-auto text-base-content"
-        style={{ overflowWrap: "break-word" }}
         dangerouslySetInnerHTML={{ __html: cleanHtml }}
       />
-      {article.tags && article.tags.length > 0 && (
-        <div className="mt-12 pt-6 border-t border-base-300">
-          <h3 className="text-lg font-semibold mb-3">Tags</h3>
+
+      {/* Footer: Tags & Actions */}
+      <div className="flex flex-wrap justify-between items-start gap-4 mt-12 pt-6 border-t border-base-300">
+        {/* Tags */}
+        {article.tags && article.tags.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {article.tags.map((tag) => (
-              <div key={tag._id} className="badge badge-outline badge-lg">
-                {tag.name}
+              // --- CHANGE: No longer a Link ---
+              <div key={tag._id} className="badge badge-lg badge-outline">
+                #{tag.name}
               </div>
             ))}
           </div>
+        )}
+
+        {/* --- CHANGE: Added ArticleActions --- */}
+        {/* This will only render if the current user is the author */}
+        <div className="flex-shrink-0">
+          <ArticleActions articleId={article._id} author={article.author} />
         </div>
-      )}
+      </div>
     </article>
   );
 }

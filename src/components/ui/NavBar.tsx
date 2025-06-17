@@ -6,13 +6,13 @@ import { ThemeToggle } from "./ThemeToggle";
 
 export default function NavBar() {
   // Define active props once for reuse
-  const activeLinkProps = {
-    className: "active font-bold", // DaisyUI's 'active' class usually adds a background color
-  };
+  // const activeLinkProps = {
+  //   className: "active font-bold", // DaisyUI's 'active' class usually adds a background color
+  // };
 
   const navLinks = (
     <>
-      <li>
+      {/* <li>
         <Link
           to="/"
           activeProps={activeLinkProps}
@@ -20,17 +20,17 @@ export default function NavBar() {
         >
           Home
         </Link>
-      </li>
-      <li>
+      </li> */}
+      {/* <li>
         <Link to="/articles" activeProps={activeLinkProps}>
           Articles
         </Link>
-      </li>
-      <li>
+      </li> */}
+      {/* <li>
         <Link to="/about" activeProps={activeLinkProps}>
           About
         </Link>
-      </li>
+      </li> */}
     </>
   );
   return (
@@ -38,7 +38,7 @@ export default function NavBar() {
       {/* START: Contains mobile hamburger and the site title */}
       <div className="navbar-start">
         {/* Mobile Dropdown Menu */}
-        <div className="dropdown">
+        {/* <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -61,11 +61,11 @@ export default function NavBar() {
           >
             {navLinks}
           </ul>
-        </div>
+        </div> */}
 
         {/* --- CHANGE: Site Title is now permanently here and has no responsive classes --- */}
         <Link to="/" className="btn btn-ghost text-xl normal-case">
-          MyBlog
+          Bloggy
         </Link>
       </div>
 

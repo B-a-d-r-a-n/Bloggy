@@ -5,20 +5,33 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import articleService from "../../core/services/articleService";
-// import type { PaginatedArticlesResponse } from "../../core/types/api";
 import type { ArticleFull } from "../../core/types/article";
-import { useNavigate } from "@tanstack/react-router";
+import toast from "react-hot-toast";
+import starService from "../../core/services/starService";
+import { userKeys } from "../profile/queries";
+import { useCurrentUser } from "../auth/queries";
+
 export const articleKeys = {
   all: ["articles"] as const,
   allLists: () => [...articleKeys.all, "list"] as const,
-  list: (filters: object) => [...articleKeys.allLists(), filters] as const,
+  list: (filters: { q?: string; category?: string }) =>
+    [...articleKeys.allLists(), filters] as const,
   allDetails: () => [...articleKeys.all, "detail"] as const,
   detail: (id: string) => [...articleKeys.allDetails(), id] as const,
 };
-export const useInfiniteArticles = () => {
+
+interface ArticleFilters {
+  q?: string;
+  category?: string;
+  author?: string;
+  sort?: "newest" | "oldest" | "stars";
+}
+
+export const useInfiniteArticles = (filters: ArticleFilters = {}) => {
   return useInfiniteQuery({
-    queryKey: articleKeys.allLists(),
-    queryFn: ({ pageParam }) => articleService.fetchArticles(pageParam),
+    queryKey: articleKeys.list(filters),
+    queryFn: ({ pageParam }) =>
+      articleService.fetchArticles({ ...filters, page: pageParam }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       return lastPage.pagination.hasNextPage
@@ -27,6 +40,7 @@ export const useInfiniteArticles = () => {
     },
   });
 };
+
 export const useGetArticleById = (
   articleId: string,
   options?: { enabled?: boolean }
@@ -37,65 +51,160 @@ export const useGetArticleById = (
     ...options,
   });
 };
+
 export const useCreateArticle = () => {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   return useMutation({
     mutationFn: (formData: FormData): Promise<ArticleFull> =>
       articleService.createNewArticle(formData),
-    onSuccess: (newArticle) => {
+    onMutate: () => {
+      // Show loading toast
+      return toast.loading("Publishing article...");
+    },
+    onSuccess: (newArticle, _, toastId) => {
       console.log("Article created, received data:", newArticle);
+      // Dismiss loading toast and show success
+      toast.success("Article published successfully!", { id: toastId });
       queryClient.invalidateQueries({ queryKey: articleKeys.allLists() });
       queryClient.setQueryData(articleKeys.detail(newArticle._id), newArticle);
-      navigate({
-        to: "/articles/$articleId",
-        params: { articleId: newArticle._id },
-        replace: true,
-      });
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _, toastId) => {
       console.error("Error creating article:", error);
+      // Dismiss loading toast and show error
+      toast.error(`Failed to publish article: ${error.message}`, {
+        id: toastId,
+        duration: 5000,
+      });
     },
   });
 };
+
 export const useUpdateArticle = () => {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   return useMutation({
     mutationFn: (variables: { articleId: string; formData: FormData }) =>
       articleService.editExistingArticle(
         variables.articleId,
         variables.formData
       ),
-    onSuccess: (updatedArticle) => {
+    onMutate: () => {
+      // Show loading toast
+      return toast.loading("Updating article...");
+    },
+    onSuccess: (updatedArticle, _, toastId) => {
       console.log("Article updated successfully:", updatedArticle);
+      // Dismiss loading toast and show success
+      toast.success("Article updated successfully!", { id: toastId });
       queryClient.invalidateQueries({ queryKey: articleKeys.allLists() });
       queryClient.setQueryData(
         articleKeys.detail(updatedArticle._id),
         updatedArticle
       );
-      navigate({
-        to: "/articles/$articleId",
-        params: { articleId: updatedArticle._id },
-        replace: true,
+    },
+    onError: (error: Error, _, toastId) => {
+      console.error("Error updating article:", error);
+      // Dismiss loading toast and show error
+      toast.error(`Failed to update article: ${error.message}`, {
+        id: toastId,
+        duration: 5000,
       });
     },
   });
 };
+
+export const useToggleStar = () => {
+  const queryClient = useQueryClient();
+  const { data: currentUser } = useCurrentUser();
+
+  return useMutation({
+    mutationFn: (articleId: string) => starService.toggleStar(articleId),
+    onMutate: async (articleId: string) => {
+      if (!currentUser) {
+        toast.error("Please log in to star articles");
+        return;
+      }
+
+      const detailKey = articleKeys.detail(articleId);
+      await queryClient.cancelQueries({ queryKey: detailKey });
+
+      const previousArticle = queryClient.getQueryData(detailKey) as
+        | ArticleFull
+        | undefined;
+      if (!previousArticle) return;
+
+      const isCurrentlyStarred = previousArticle.starredBy.includes(
+        currentUser._id
+      );
+
+      // Show optimistic toast
+      toast.success(isCurrentlyStarred ? "Star removed" : "Star given!", {
+        duration: 2000,
+      });
+
+      queryClient.setQueryData(detailKey, {
+        ...previousArticle,
+        starredBy: isCurrentlyStarred
+          ? previousArticle.starredBy.filter((id) => id !== currentUser._id)
+          : [...previousArticle.starredBy, currentUser._id],
+        starsCount: isCurrentlyStarred
+          ? previousArticle.starsCount - 1
+          : previousArticle.starsCount + 1,
+      });
+
+      return { previousArticle, isCurrentlyStarred };
+    },
+    onError: (err, articleId, context) => {
+      console.error("Error toggling star:", err);
+
+      if (context?.previousArticle) {
+        queryClient.setQueryData(
+          articleKeys.detail(articleId),
+          context.previousArticle
+        );
+      }
+
+      // Show error toast
+      toast.error("An Error occured! did you try to star your own article ?.", {
+        duration: 4000,
+      });
+    },
+    onSettled: (data, error, articleId, context) => {
+      const authorId = (context as any)?.previousArticle?.author?._id;
+      console.log(data, error);
+
+      queryClient.invalidateQueries({
+        queryKey: articleKeys.detail(articleId),
+      });
+      if (authorId) {
+        queryClient.invalidateQueries({ queryKey: userKeys.detail(authorId) });
+      }
+      queryClient.invalidateQueries({ queryKey: articleKeys.allLists() });
+    },
+  });
+};
+
 export const useDeleteArticle = () => {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   return useMutation({
     mutationFn: (articleId: string) => articleService.deleteArticle(articleId),
-    onSuccess: (_, articleId) => {
+    onMutate: () => {
+      // Show loading toast
+      return toast.loading("Deleting article...");
+    },
+    onSuccess: (_, articleId, toastId) => {
       console.log(`Article ${articleId} deleted successfully.`);
+      // Dismiss loading toast and show success
+      toast.success("Article deleted successfully!", { id: toastId });
       queryClient.invalidateQueries({ queryKey: articleKeys.allLists() });
       queryClient.removeQueries({ queryKey: articleKeys.detail(articleId) });
-      navigate({ to: "/articles" });
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _, toastId) => {
       console.error("Failed to delete article:", error);
-      alert(`Error: ${error.message}`);
+      // Dismiss loading toast and show error
+      toast.error(`Failed to delete article: ${error.message}`, {
+        id: toastId,
+        duration: 5000,
+      });
     },
   });
 };
