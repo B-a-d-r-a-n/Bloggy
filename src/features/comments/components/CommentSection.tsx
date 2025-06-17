@@ -6,9 +6,13 @@ import { useCurrentUser } from "../../auth/queries";
 
 interface CommentSectionProps {
   articleId: string;
+  totalCommentCount: number;
 }
 
-export default function CommentSection({ articleId }: CommentSectionProps) {
+export default function CommentSection({
+  articleId,
+  totalCommentCount,
+}: CommentSectionProps) {
   const { data: user } = useCurrentUser();
   const {
     data,
@@ -26,12 +30,11 @@ export default function CommentSection({ articleId }: CommentSectionProps) {
   };
 
   const comments = data?.pages.flatMap((page) => page.data) ?? [];
-  const totalComments = data?.pages[0]?.pagination.totalItems ?? 0;
 
   return (
     <div id="comment-section" className="space-y-8 max-w-4xl mx-auto">
       <h2 className="text-2xl font-bold border-b border-base-300 pb-4">
-        {totalComments} {totalComments === 1 ? "Comment" : "Comments"}
+        {totalCommentCount} {totalCommentCount === 1 ? "Comment" : "Comments"}
       </h2>
 
       {/* New Comment Form */}

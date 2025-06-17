@@ -62,7 +62,10 @@ function ArticleDetailPage() {
 
       {/* You can add the Comment Section component right below it */}
       <div className="max-w-4xl mx-auto mt-16">
-        <CommentSection articleId={article!._id} />
+        <CommentSection
+          totalCommentCount={article!.totalCommentCount}
+          articleId={article!._id}
+        />
       </div>
     </div>
   );
