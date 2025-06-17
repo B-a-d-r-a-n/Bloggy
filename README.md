@@ -2,7 +2,7 @@
 
 Welcome to the frontend of Bloggy, a modern, feature-rich blogging platform. This project was built with React, TypeScript, and the TanStack ecosystem, focusing on a clean user experience and a robust, type-safe architecture.
 
-![Screenshot of Bloggy Homepage]([https://prnt.sc/nw8NGzLWg-AF](https://media.discordapp.net/attachments/648910564818550799/1384650578277437501/image.png?ex=685333d7&is=6851e257&hm=10b9be711c9db39ff99adc88083ab67bc3a67077a8a69c053385c3f9e6325293&=&format=webp&quality=lossless&width=1039&height=584))
+![Screenshot of Bloggy Homepage](https://media.discordapp.net/attachments/648910564818550799/1384650578277437501/image.png?ex=685333d7&is=6851e257&hm=10b9be711c9db39ff99adc88083ab67bc3a67077a8a69c053385c3f9e6325293&=&format=webp&quality=lossless&width=1039&height=584)
 
 **Live Demo:** [https://bloggy-beta-seven.vercel.app/about](https://bloggy-beta-seven.vercel.app/about)
 
