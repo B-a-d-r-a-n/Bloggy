@@ -1,54 +1,89 @@
-# React + TypeScript + Vite
+# Bloggy - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome to the frontend of Bloggy, a modern, feature-rich blogging platform. This project was built with React, TypeScript, and the TanStack ecosystem, focusing on a clean user experience and a robust, type-safe architecture.
 
-Currently, two official plugins are available:
+![Screenshot of Bloggy Homepage](https://prnt.sc/nw8NGzLWg-AF)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**Live Demo:** [https://bloggy-beta-seven.vercel.app/about](https://bloggy-beta-seven.vercel.app/about)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## ✨ Features
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+- **Full CRUD for Articles:** Create, read, update, and delete articles with a rich text editor.
+- **User Authentication:** Secure JWT-based authentication with `httpOnly` refresh tokens.
+- **Interactive Commenting:** Nested comments and replies with edit/delete functionality.
+- **Reputation System:** Users can "star" articles, and authors accumulate total stars.
+- **User Profiles:** View author profiles and update your own profile picture.
+- **Search & Filtering:** Dynamic, real-time search for articles by title, author, and category.
+- **Infinite Scrolling:** Smooth, infinite scroll on the main article list.
+- **Theming:** Seamless light and dark mode support.
+- **Responsive Design:** A polished UI that works beautifully on all screen sizes.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🚀 Tech Stack
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+- **Framework:** [React 19](https://react.dev/) with [Vite](https://vitejs.dev/)
+- **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **Routing:** [TanStack Router](https://tanstack.com/router/)
+- **Data Fetching & State Management:** [TanStack Query (React Query)](https://tanstack.com/query/)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/) with [DaisyUI](https://daisyui.com/)
+- **Forms:** [React Hook Form](https://react-hook-form.com/) with [Zod](https://zod.dev/) for validation
+- **API Client:** [Axios](https://axios-http.com/) with interceptors for auth and feedback.
+- **UI Feedback:** [react-hot-toast](https://react-hot-toast.com/) for notifications and [NProgress](https://github.com/rstacruz/nprogress) for page load indicators.
+
+---
+
+## 🛠️ Getting Started
+
+Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
+
+### Prerequisites
+
+- Node.js (v18 or later recommended)
+- npm or yarn
+
+### Installation
+
+1.  **Clone the repository:**
+
+    ```sh
+    git clone https://github.com/B-a-d-r-a-n/Bloggy.git
+    cd bloggy-frontend
+    ```
+
+2.  **Install NPM packages:**
+
+    ```sh
+    npm install
+    ```
+
+3.  **Set up environment variables:**
+    Create a `.env.local` file in the root of the project and add the URL of your running backend API:
+
+    ```env
+    VITE_API_URL=http://localhost:3000
+    ```
+
+    You will also need an API key for the rich text editor if you chose one that requires it (e.g., TinyMCE).
+
+4.  **Run the development server:**
+    ```sh
+    npm run dev
+    ```
+    The application will be available at `http://localhost:5173` (or another port if 5173 is in use).
+
+---
+
+## 📜 Available Scripts
+
+- `npm run dev`: Starts the development server.
+- `npm run build`: Builds the app for production.
+- `npm run lint`: Lints the code using ESLint.
+
+---
+
+## Acknowledgements
+
+- Hat tip to the teams behind TanStack, Vercel, and Tailwind CSS for creating amazing tools for developers.

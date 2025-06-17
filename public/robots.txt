@@ -1,0 +1,20 @@
+# This file tells web crawlers which pages they are allowed to visit.
+# For our blog, we want to allow almost everything so it can be indexed by search engines.
+
+# Allow all user agents (crawlers)
+User-agent: *
+
+# Allow access to all pages on the site. The "/" means the root and everything under it.
+Allow: /
+
+# Disallow crawlers from trying to index the API paths, as they are not web pages.
+# This prevents them from making unnecessary requests and cluttering their index.
+Disallow: /api/
+
+# You can also disallow specific pages you don't want indexed, for example:
+Disallow: /login
+Disallow: /signup
+Disallow: /articles/action
+
+# Point crawlers to your sitemap (highly recommended for SEO).
+# You can generate a sitemap automatically with various tools or services.

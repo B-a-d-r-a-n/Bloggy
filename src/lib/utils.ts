@@ -41,3 +41,27 @@ export function getUserAvatar(
 
   return `https://ui-avatars.com/api/?name=${initials}&background=${backgroundColor}&color=${textColor}&size=128`;
 }
+
+/**
+ * Takes a raw Cloudinary URL and returns a new URL with
+ * performance-optimizing transformations applied.
+ * @param originalUrl The original image URL from your database.
+ * @param width The target display width of the image in pixels.
+ * @returns A new, optimized image URL.
+ */
+export function getOptimizedCloudinaryUrl(
+  originalUrl: string,
+  width: number
+): string {
+  if (!originalUrl || !originalUrl.includes("res.cloudinary.com")) {
+    return originalUrl; // Return original if it's not a Cloudinary URL
+  }
+
+  // The transformation string we want to insert.
+  // f_auto: automatic format, q_auto: automatic quality,
+  // w_...: set width, dpr_auto: handle high-res screens.
+  const transformations = `f_auto,q_auto,w_${width},dpr_auto`;
+
+  // Insert the transformation string into the URL right after `/upload/`.
+  return originalUrl.replace("/upload/", `/upload/${transformations}/`);
+}
