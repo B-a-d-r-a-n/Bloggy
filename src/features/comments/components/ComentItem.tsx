@@ -84,7 +84,7 @@ export default function CommentItem({ comment, articleId }: CommentItemProps) {
         </div>
 
         {/* --- ACTIONS: Reply, Edit, Delete --- */}
-        {!isEditing && (
+        {user && !isEditing && (
           <div className="flex items-center gap-2 text-xs font-medium text-base-content/60 pl-2 pt-1">
             <button
               className="hover:text-primary cursor-pointer"
