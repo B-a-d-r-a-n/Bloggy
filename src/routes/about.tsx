@@ -86,7 +86,7 @@ function AboutPage() {
           </div>
         </section>
 
-        {/* --- 4. Call to Action (CTA) Section --- */}
+        {/* --- Call to Action (CTA) Section --- */}
         {/* We only render this entire section if the user is NOT logged in */}
         {!user && (
           <section className="text-center bg-base-200 p-8 md:p-12 rounded-lg">
