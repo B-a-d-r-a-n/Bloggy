@@ -4,6 +4,7 @@
     garden --default,
     sunset --prefersdark;
 }
+
 /* Base toast styles */
 .toast {
   background-color: hsl(var(--b2));
