@@ -42,7 +42,7 @@ export default function ArticleActions({
         onClick={handleDelete}
         className="btn btn-ghost btn-square btn-sm group"
         aria-label="Delete"
-        disabled={deleteMutation.isPending} // Disable button while deleting
+        disabled={deleteMutation.isPending}
       >
         {deleteMutation.isPending ? (
           <span className="loading loading-spinner loading-xs"></span>

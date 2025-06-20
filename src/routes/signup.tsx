@@ -4,7 +4,6 @@ import { authKeys } from "../features/auth/queries";
 export const Route = createFileRoute("/signup")({
   beforeLoad: ({ context }) => {
     const user = context.queryClient.getQueryData(authKeys.me);
-
     if (user) {
       console.log("User is already logged in, redirecting from /signup");
       throw redirect({

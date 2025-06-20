@@ -1,21 +1,18 @@
 import { Link } from "@tanstack/react-router";
 import { useInfiniteArticles } from "../../articles/queries";
-import ArticleList from "../../articles/components/ArticleList"; // Reusing our dumb component
-import EmptyState from "../../../components/ui/EmptyState"; // Reusing our EmptyState component
+import ArticleList from "../../articles/components/ArticleList";
+import EmptyState from "../../../components/ui/EmptyState";
 import { PencilSquareIcon, NewspaperIcon } from "@heroicons/react/24/outline";
-
 interface ProfileArticleListProps {
   authorId: string;
   authorName: string;
   isOwnProfile: boolean;
 }
-
 export default function ProfileArticleList({
   authorId,
   authorName,
   isOwnProfile,
 }: ProfileArticleListProps) {
-  // Fetch the articles for this specific author
   const {
     data,
     isLoading,
@@ -24,13 +21,7 @@ export default function ProfileArticleList({
     fetchNextPage,
     isFetchingNextPage,
   } = useInfiniteArticles({ author: authorId });
-
-  // The main ArticleList component already handles the `isLoading` state by showing skeletons.
-  // We only need to handle the final state (empty or not).
-
   const totalArticles = data?.pages[0]?.pagination.totalItems ?? 0;
-
-  // Don't render anything until the initial fetch is complete
   if (isLoading) {
     return (
       <div className="mt-16 text-center">
@@ -38,7 +29,6 @@ export default function ProfileArticleList({
       </div>
     );
   }
-
   if (isError) {
     return (
       <p className="mt-16 text-center text-error">
@@ -46,12 +36,8 @@ export default function ProfileArticleList({
       </p>
     );
   }
-
-  // --- THIS IS THE NEW UX LOGIC ---
   if (totalArticles === 0) {
-    // If the list is empty, decide which message to show
     if (isOwnProfile) {
-      // Message for the logged-in user viewing their own empty profile
       return (
         <div className="mt-16">
           <EmptyState
@@ -83,8 +69,6 @@ export default function ProfileArticleList({
       );
     }
   }
-
-  // If there are articles, render the list
   return (
     <div className="mt-16">
       <h3 className="text-2xl font-bold mb-6 text-center sm:text-left">
@@ -92,7 +76,7 @@ export default function ProfileArticleList({
       </h3>
       <ArticleList
         data={data}
-        isLoading={isLoading} // Will be false here, but good practice to pass
+        isLoading={isLoading}
         isError={isError}
         hasNextPage={hasNextPage}
         fetchNextPage={fetchNextPage}

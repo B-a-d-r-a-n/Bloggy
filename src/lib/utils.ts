@@ -16,19 +16,12 @@ export function getUserAvatar(
   name?: string,
   avatarUrl?: string | null
 ): string {
-  // If a valid Cloudinary URL is provided, use it.
   if (avatarUrl) {
     return avatarUrl;
   }
-
-  // If no name is provided, return a default generic avatar.
   if (!name || name.trim() === "") {
-    // You can host a generic avatar image in your `public` folder
     return "/default-avatar.png";
   }
-
-  // Otherwise, generate a placeholder with initials from ui-avatars.com
-  // Example: "Mohamed Badran" -> "MB"
   const initials = name
     .split(" ")
     .map((n) => n[0])
@@ -56,12 +49,6 @@ export function getOptimizedCloudinaryUrl(
   if (!originalUrl || !originalUrl.includes("res.cloudinary.com")) {
     return originalUrl; // Return original if it's not a Cloudinary URL
   }
-
-  // The transformation string we want to insert.
-  // f_auto: automatic format, q_auto: automatic quality,
-  // w_...: set width, dpr_auto: handle high-res screens.
   const transformations = `f_auto,q_auto,w_${width},dpr_auto`;
-
-  // Insert the transformation string into the URL right after `/upload/`.
   return originalUrl.replace("/upload/", `/upload/${transformations}/`);
 }

@@ -1,15 +1,12 @@
 import React, { useId } from "react";
 import { cn } from "../../lib/utils";
-
 interface FormSelectProps
   extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label: string;
   children: React.ReactNode;
 }
-
 export function FormSelect({ label, children, ...props }: FormSelectProps) {
   const id = useId();
-
   return (
     <div>
       <label

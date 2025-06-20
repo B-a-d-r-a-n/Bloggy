@@ -6,7 +6,6 @@ import {
   XMarkIcon,
 } from "@heroicons/react/20/solid";
 import type { Tag } from "../../core/types/tag";
-
 interface MultiSelectComboboxProps {
   options: Tag[];
   selected: Tag[];
@@ -15,7 +14,6 @@ interface MultiSelectComboboxProps {
   onCreate: (tagName: string) => Promise<Tag | null>;
   isCreating: boolean;
 }
-
 export default function MultiSelectCombobox({
   options,
   selected,
@@ -25,7 +23,6 @@ export default function MultiSelectCombobox({
   isCreating,
 }: MultiSelectComboboxProps) {
   const [query, setQuery] = useState("");
-
   const handleCreate = async () => {
     if (query.trim() === "") return;
     const newTag = await onCreate(query.trim());
@@ -34,11 +31,9 @@ export default function MultiSelectCombobox({
     }
     setQuery("");
   };
-
   const handleDeselect = (tagToRemove: Tag) => {
     onChange(selected.filter((s) => s._id !== tagToRemove._id));
   };
-
   const filteredOptions =
     query === ""
       ? options.filter((opt) => !selected.some((sel) => sel._id === opt._id))
@@ -47,12 +42,10 @@ export default function MultiSelectCombobox({
             !selected.some((sel) => sel._id === option._id) &&
             option.name.toLowerCase().includes(query.toLowerCase())
         );
-
   const exactMatchExists = options.some(
     (opt) => opt.name.toLowerCase() === query.toLowerCase().trim()
   );
   const showCreateOption = query.trim() !== "" && !exactMatchExists;
-
   return (
     <div>
       {/* Display Selected Tags */}
@@ -115,7 +108,6 @@ export default function MultiSelectCombobox({
                 )}
               </li>
             )}
-
             {filteredOptions.length === 0 && !showCreateOption ? (
               <div className="relative cursor-default select-none py-2 px-4 text-gray-700">
                 Nothing found.
@@ -135,7 +127,7 @@ export default function MultiSelectCombobox({
                 >
                   {({ selected, active }) => (
                     <>
-                      {/* --- THIS IS THE FIX --- */}
+                      {}
                       <span
                         className={`block truncate ${
                           selected ? "font-bold" : "font-normal"

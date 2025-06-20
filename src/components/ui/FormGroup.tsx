@@ -1,7 +1,5 @@
 import type { ReactNode } from "@tanstack/react-router";
 import { cn } from "../../lib/utils";
-
-// This component now provides more vertical space between each form field.
 export function FormGroup({
   children,
   className,

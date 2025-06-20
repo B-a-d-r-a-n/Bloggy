@@ -7,7 +7,6 @@ import {
   type FieldValues,
   type Path,
 } from "react-hook-form";
-
 interface FormFileInputProps<T extends FieldValues> {
   control: Control<T>;
   name: Path<T>;
@@ -16,7 +15,6 @@ interface FormFileInputProps<T extends FieldValues> {
   disabled?: boolean;
   accept?: string;
 }
-
 export function FormFileInput<T extends FieldValues>({
   control,
   name,
@@ -26,7 +24,6 @@ export function FormFileInput<T extends FieldValues>({
   accept,
 }: FormFileInputProps<T>) {
   const id = useId();
-
   return (
     <FormGroup>
       <label
@@ -47,9 +44,7 @@ export function FormFileInput<T extends FieldValues>({
             ref={ref}
             name={name}
             onBlur={onBlur}
-            // The key is to specifically handle the onChange event
             onChange={(e) => {
-              // Pass the entire FileList object to React Hook Form's state
               onChange(e.target.files);
             }}
             className={cn(

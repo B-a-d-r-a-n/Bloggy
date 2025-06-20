@@ -8,19 +8,14 @@ interface FetchArticlesParams {
   page?: number;
   sort?: string;
 }
-
 class ArticleService {
   async fetchArticles(
     params: FetchArticlesParams = {}
   ): Promise<PaginatedArticlesResponse> {
-    // Create an object to hold only the defined query parameters.
     const queryParams: Record<string, string> = {
       page: String(params.page || 1),
-      limit: "10", // Keep a consistent limit
+      limit: "10", 
     };
-
-    // Conditionally add other parameters if they exist.
-
     if (params.q) {
       queryParams.q = params.q;
     }
@@ -36,14 +31,10 @@ class ArticleService {
       if (params.sort === "stars") sortValue = "-starsCount";
       queryParams.sort = sortValue;
     }
-
-    // Build the query string from the object.
     const queryString = new URLSearchParams(queryParams).toString();
-
     const response = await api.get<PaginatedArticlesResponse>(
       `/api/v1/articles?${queryString}`
     );
-
     return response.data;
   }
   async fetchArticleById(articleId: string): Promise<ArticleFull> {
@@ -56,10 +47,6 @@ class ArticleService {
     const response = await api.post(
       `/api/v1/articles`,
       formData,
-      // --- THIS IS THE FIX ---
-      // Explicitly override the headers for THIS request only.
-      // Setting Content-Type to `multipart/form-data` tells Axios
-      // to let the browser handle setting the correct boundary.
       {
         headers: {
           "Content-Type": "multipart/form-data",

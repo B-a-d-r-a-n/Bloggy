@@ -1,7 +1,6 @@
 import React, { useId } from "react";
 import type { UseFormRegisterReturn } from "react-hook-form";
 import { cn } from "../../lib/utils";
-
 interface FormTextAreaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;
@@ -9,7 +8,6 @@ interface FormTextAreaProps
   error?: string;
   description?: string;
 }
-
 export function FormTextArea({
   label,
   registration,
@@ -19,7 +17,6 @@ export function FormTextArea({
 }: FormTextAreaProps) {
   const id = useId();
   const errorId = `${id}-error`;
-
   return (
     <div>
       <label

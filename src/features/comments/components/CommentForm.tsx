@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useCurrentUser } from "../../auth/queries";
-
 interface CommentFormProps {
   onSubmit: (text: string) => void;
   isSubmitting: boolean;
@@ -8,7 +7,6 @@ interface CommentFormProps {
   initialText?: string;
   onCancel?: () => void;
 }
-
 export default function CommentForm({
   onSubmit,
   isSubmitting,
@@ -36,21 +34,18 @@ export default function CommentForm({
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
-      textarea.style.height = "auto"; // Reset height
-      textarea.style.height = `${textarea.scrollHeight}px`; // Set to scroll height
+      textarea.style.height = "auto";
+      textarea.style.height = `${textarea.scrollHeight}px`;
     }
   }, [text]);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (text.trim() === "" || isSubmitting) return;
     onSubmit(text);
-    // Only clear text if it's a new comment, not an edit form
     if (!initialText) {
       setText("");
     }
   };
-
   return (
     <form onSubmit={handleSubmit}>
       <div className="flex items-start gap-3">
@@ -68,18 +63,16 @@ export default function CommentForm({
             </div>
           </div>
         )}
-
         <div className="w-full">
           <textarea
             ref={textareaRef}
             className="textarea textarea-bordered w-full resize-none overflow-hidden text-base"
-            rows={1} // Start with a single row
+            rows={1}
             placeholder="Add a comment..."
             value={text}
             onChange={(e) => setText(e.target.value)}
             disabled={isSubmitting}
           ></textarea>
-
           <div className="flex justify-end items-center gap-2 mt-2">
             {/* Show Cancel button only for reply/edit forms */}
             {onCancel && (

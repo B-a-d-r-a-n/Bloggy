@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
-
 const AVAILABLE_THEMES = ["garden", "sunset"];
-
 export const useTheme = () => {
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") || AVAILABLE_THEMES[0]
   );
-
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
@@ -25,7 +22,6 @@ export const useTheme = () => {
       setTheme(themeName);
     }
   };
-
   return {
     theme,
     toggleTheme,

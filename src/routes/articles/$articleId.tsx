@@ -1,22 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useGetArticleById } from "../../features/articles/queries"; // Adjust path
-import ArticleDetailDisplay from "../../features/articles/components/ArticleDetailDisplay"; // Adjust path
+import { useGetArticleById } from "../../features/articles/queries";
+import ArticleDetailDisplay from "../../features/articles/components/ArticleDetailDisplay";
 import CommentSection from "../../features/comments/components/CommentSection";
-// Import your comment section when it's ready
-// import CommentSection from '../../features/comments/components/CommentSection';
-
 export const Route = createFileRoute("/articles/$articleId")({
   component: ArticleDetailPage,
 });
-
 function ArticleDetailPage() {
-  // Get the articleId from the URL parameters, provided by the router
   const { articleId } = Route.useParams();
-
-  // Fetch the data for this specific article
   const { data: article, isLoading, error } = useGetArticleById(articleId);
-
-  // 1. Handle Loading State
   if (isLoading) {
     return (
       <div className="max-w-4xl mx-auto space-y-8 animate-pulse">
@@ -32,8 +23,6 @@ function ArticleDetailPage() {
       </div>
     );
   }
-
-  // 2. Handle Error State
   if (error) {
     return (
       <div role="alert" className="alert alert-error max-w-2xl mx-auto">
@@ -54,13 +43,10 @@ function ArticleDetailPage() {
       </div>
     );
   }
-
-  // 3. Render the Display Component on Success
   return (
     <div className="py-8 lg:py-12">
       <ArticleDetailDisplay article={article!} />
-
-      {/* You can add the Comment Section component right below it */}
+      {}
       <div className="max-w-4xl mx-auto mt-16">
         <CommentSection
           totalCommentCount={article!.totalCommentCount}

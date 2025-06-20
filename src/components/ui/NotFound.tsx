@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
-
 export default function NotFound() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-12rem)] text-center px-4">

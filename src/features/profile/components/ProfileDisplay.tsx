@@ -1,21 +1,18 @@
 import { useRef, type ChangeEvent } from "react";
 import { useUpdateAvatar } from "../queries";
 import { getUserAvatar } from "../../../lib/utils";
-import { CameraIcon, StarIcon } from "@heroicons/react/24/solid"; // Solid icons for emphasis
+import { CameraIcon, StarIcon } from "@heroicons/react/24/solid";
 import type { User } from "../../../core/types/user";
-
 interface ProfileDisplayProps {
   user: User;
   isOwnProfile: boolean;
 }
-
 export default function ProfileDisplay({
   user,
   isOwnProfile,
 }: ProfileDisplayProps) {
   const updateAvatarMutation = useUpdateAvatar();
   const fileInputRef = useRef<HTMLInputElement>(null);
-
   const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -23,7 +20,6 @@ export default function ProfileDisplay({
     formData.append("avatar", file);
     updateAvatarMutation.mutate(formData);
   };
-
   return (
     <div className="bg-base-200 p-8 rounded-lg shadow-md flex flex-col md:flex-row items-center gap-8">
       {/* Avatar Section */}

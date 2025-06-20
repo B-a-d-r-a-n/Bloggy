@@ -6,7 +6,6 @@ import {
   UsersIcon,
 } from "@heroicons/react/24/outline";
 import { useCurrentUser } from "../features/auth/queries";
-
 function AboutPage() {
   const { data: user } = useCurrentUser();
   return (
@@ -107,8 +106,6 @@ function AboutPage() {
     </div>
   );
 }
-
-// Create and export the route definition
 export const Route = createFileRoute("/about")({
   component: AboutPage,
 });

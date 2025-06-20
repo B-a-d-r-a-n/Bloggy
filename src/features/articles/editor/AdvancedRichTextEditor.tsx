@@ -9,7 +9,6 @@ import {
   type ChangeEvent,
   type KeyboardEvent,
 } from "react";
-
 interface AdvancedRichTextEditorProps {
   content?: string;
   onChange: (newContent: string) => void;
@@ -38,7 +37,6 @@ const AdvancedRichTextEditor = ({
     setWordCount(words);
     setCharCount(chars);
   }, [text]);
-
   const handleTextChange = useCallback(
     (e: ChangeEvent<HTMLTextAreaElement>) => {
       const newText = e.target.value;
@@ -49,14 +47,13 @@ const AdvancedRichTextEditor = ({
       if (newText !== undoStack[undoIndex]) {
         const newStack = undoStack.slice(0, undoIndex + 1);
         newStack.push(newText);
-        if (newStack.length > 50) newStack.shift(); // Limit stack size
+        if (newStack.length > 50) newStack.shift();
         setUndoStack(newStack);
         setUndoIndex(newStack.length - 1);
       }
     },
     [undoStack, undoIndex, onChange]
   );
-
   const undo = () => {
     if (undoIndex > 0) {
       const newIndex = undoIndex - 1;
@@ -66,7 +63,6 @@ const AdvancedRichTextEditor = ({
       onChange?.(previousText);
     }
   };
-
   const redo = () => {
     if (undoIndex < undoStack.length - 1) {
       const newIndex = undoIndex + 1;
@@ -76,21 +72,17 @@ const AdvancedRichTextEditor = ({
       onChange?.(nextText);
     }
   };
-
   const insertMarkdown = useCallback(
     (before: string, after = "", newLine = false) => {
       const textarea = textareaRef.current;
       if (!textarea) return;
-
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
       const selectedText = text.substring(start, end);
-
       let insertion = before + selectedText + after;
       if (newLine && start > 0 && text[start - 1] !== "\n") {
         insertion = "\n" + insertion;
       }
-
       const newText =
         text.substring(0, start) + insertion + text.substring(end);
       setText(newText);
@@ -108,17 +100,14 @@ const AdvancedRichTextEditor = ({
     },
     [text, onChange]
   );
-
   const insertList = useCallback(
     (type: "bullet" | "number") => {
       const textarea = textareaRef.current;
       if (!textarea) return;
-
       const start = textarea.selectionStart;
       const lines = text.split("\n");
       let currentLine = 0;
       let charCount = 0;
-
       for (let i = 0; i < lines.length; i++) {
         if (charCount + lines[i].length >= start) {
           currentLine = i;
@@ -126,10 +115,8 @@ const AdvancedRichTextEditor = ({
         }
         charCount += lines[i].length + 1;
       }
-
       const prefix = type === "bullet" ? "• " : "1. ";
       const currentLineText = lines[currentLine];
-
       if (currentLineText.match(/^(\• |[0-9]+\. )/)) {
         // Remove existing list formatting
         lines[currentLine] = currentLineText.replace(/^(\• |[0-9]+\. )/, "");
@@ -137,14 +124,12 @@ const AdvancedRichTextEditor = ({
         // Add list formatting
         lines[currentLine] = prefix + currentLineText;
       }
-
       const newText = lines.join("\n");
       setText(newText);
       onChange?.(newText);
     },
     [text, onChange]
   );
-
   const insertTable = useCallback(() => {
     const tableMarkdown = `
 | Header 1 | Header 2 | Header 3 |
@@ -154,14 +139,12 @@ const AdvancedRichTextEditor = ({
 `;
     insertMarkdown(tableMarkdown.trim(), "", true);
   }, [insertMarkdown]);
-
   const insertLink = useCallback(() => {
     const url = prompt("Enter URL:");
     if (url) {
       insertMarkdown("[", `](${url})`);
     }
   }, [insertMarkdown]);
-
   const insertImage = useCallback(() => {
     const url = prompt("Enter image URL:");
     if (url) {
@@ -169,17 +152,12 @@ const AdvancedRichTextEditor = ({
       insertMarkdown(`![${alt}](${url})`, "", true);
     }
   }, [insertMarkdown]);
-
   const convertToHtml = useCallback((markdown: string): string => {
     if (!markdown?.trim()) {
       return "";
     }
-    // Step A: Convert the Markdown string to an HTML string using the `marked` library.
     const rawHtml = marked.parse(markdown) as string;
-
-    // Step B: Sanitize the resulting HTML to prevent XSS attacks.
     const cleanHtml = DOMPurify.sanitize(rawHtml);
-
     return cleanHtml;
   }, []);
 
@@ -225,7 +203,7 @@ const AdvancedRichTextEditor = ({
     children: ReactNode;
     title: string;
     active?: boolean;
-    disabled?: boolean; // Renamed from `buttonDisabled` for clarity and consistency
+    disabled?: boolean;
   }
   const ToolbarButton = ({
     onClick,
@@ -244,11 +222,9 @@ const AdvancedRichTextEditor = ({
       {children}
     </button>
   );
-
   const ButtonGroup = ({ children }: ButtonGroupProps) => (
     <div className="flex items-center rounded-lg">{children}</div>
   );
-
   return (
     <div className="w-full">
       <div className="mb-6">
@@ -256,9 +232,8 @@ const AdvancedRichTextEditor = ({
           Let your imagination run wild
         </h1>
       </div>
-
       <div className="border border-base-300 rounded-lg shadow-sm bg-base-100">
-        {/* Enhanced Toolbar */}
+        {}
         <div className="flex flex-wrap items-center gap-x-2 p-2 bg-base-200 border-b border-base-300">
           {/* Text Formatting */}
           <ButtonGroup>
@@ -293,7 +268,6 @@ const AdvancedRichTextEditor = ({
               &lt;/&gt;
             </ToolbarButton>
           </ButtonGroup>
-
           <div className="w-px h-6 bg-gray-300"></div>
 
           {/* Headers */}
@@ -323,7 +297,6 @@ const AdvancedRichTextEditor = ({
               💬
             </ToolbarButton>
           </ButtonGroup>
-
           <div className="w-px h-6 bg-gray-300"></div>
 
           {/* Lists */}
@@ -341,7 +314,6 @@ const AdvancedRichTextEditor = ({
               1. List
             </ToolbarButton>
           </ButtonGroup>
-
           <div className="w-px h-6 bg-gray-300"></div>
 
           {/* Media & Links */}
@@ -362,7 +334,6 @@ const AdvancedRichTextEditor = ({
               📝
             </ToolbarButton>
           </ButtonGroup>
-
           <div className="w-px h-6 bg-gray-300"></div>
 
           {/* Undo/Redo */}
@@ -382,7 +353,6 @@ const AdvancedRichTextEditor = ({
               ↷
             </ToolbarButton>
           </ButtonGroup>
-
           <div className="flex-1"></div>
 
           {/* View Controls */}
@@ -548,7 +518,7 @@ const AdvancedRichTextEditor = ({
           📄 View Rendered HTML
         </summary>
         <div className="collapse-content">
-          {/* Use DaisyUI's `mockup-code` for a beautiful code block display */}
+          {}
           <div className="mockup-code text-sm">
             <pre data-prefix="~">
               <code>{convertToHtml(text) || "<p>No content yet.</p>"}</code>
@@ -559,5 +529,4 @@ const AdvancedRichTextEditor = ({
     </div>
   );
 };
-
 export default AdvancedRichTextEditor;

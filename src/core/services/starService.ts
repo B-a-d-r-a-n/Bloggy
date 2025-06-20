@@ -1,9 +1,4 @@
 import { api } from "../../lib/api";
-
-/**
- * The expected shape of the successful response from the backend's
- * POST /api/v1/articles/:articleId/star endpoint.
- */
 interface ToggleStarResponse {
   status: "success";
   data: {
@@ -11,7 +6,6 @@ interface ToggleStarResponse {
     newCount: number;
   };
 }
-
 class StarService {
   /**
    * Toggles a star on a specific article for the currently authenticated user.
@@ -24,9 +18,7 @@ class StarService {
     const response = await api.post<ToggleStarResponse>(
       `/api/v1/articles/${articleId}/star`
     );
-
     return response.data;
   }
 }
-
 export default new StarService();

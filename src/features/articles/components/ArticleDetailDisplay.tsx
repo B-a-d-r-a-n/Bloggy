@@ -9,30 +9,24 @@ import type { ArticleFull } from "../../../core/types/article";
 import { Link } from "@tanstack/react-router";
 import { marked } from "marked";
 import StarButton from "./StarButton";
-
 interface ArticleDetailDisplayProps {
   article: ArticleFull;
 }
-
 export default function ArticleDetailDisplay({
   article,
 }: ArticleDetailDisplayProps) {
   const rawHtml = marked.parse(article.content) as string;
   const cleanHtml = DOMPurify.sanitize(rawHtml);
-
-  // Helper function to scroll to the comments section
   const scrollToComments = () => {
     document
       .getElementById("comment-section")
       ?.scrollIntoView({ behavior: "smooth" });
   };
-
   return (
     <article className="max-w-4xl mx-auto">
       {/* Header Section */}
       <header className="text-center mb-8">
         {article.category && (
-          // --- CHANGE: No longer a Link ---
           <div className="badge badge-primary font-semibold mb-4 text-sm py-3 px-4">
             {article.category.name}
           </div>
@@ -58,7 +52,6 @@ export default function ArticleDetailDisplay({
       )}
       {/* Author and Meta Info Bar */}
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 my-8 border-y border-base-300 py-4">
-        {/* Author Info (Remains a Link) */}
         <div className="flex items-center gap-4">
           <Link
             params={{ userId: article.author._id }}
@@ -101,7 +94,7 @@ export default function ArticleDetailDisplay({
               {article.readTimeInMinutes} min read
             </span>
           </div>
-          {/* --- Comment Count --- */}
+          {}
           <button
             onClick={scrollToComments}
             className="flex items-center gap-2 hover:text-primary transition-colors"
@@ -128,11 +121,10 @@ export default function ArticleDetailDisplay({
 
       {/* Footer: Tags & Actions */}
       <div className="flex flex-wrap justify-between items-start gap-4 mt-12 pt-6 border-t border-base-300">
-        {/* Tags */}
+        {}
         {article.tags && article.tags.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {article.tags.map((tag) => (
-              // --- CHANGE: No longer a Link ---
               <div key={tag._id} className="badge badge-lg badge-outline">
                 #{tag.name}
               </div>
@@ -140,8 +132,7 @@ export default function ArticleDetailDisplay({
           </div>
         )}
 
-        {/* --- CHANGE: Added ArticleActions --- */}
-        {/* This will only render if the current user is the author */}
+        {/* only render if the current user is the author */}
         <div className="flex-shrink-0">
           <ArticleActions articleId={article._id} author={article.author} />
         </div>

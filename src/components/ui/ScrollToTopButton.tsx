@@ -1,20 +1,15 @@
 import { ArrowUpIcon } from "@heroicons/react/24/solid";
-import { useScrollPosition } from "../../hooks/useScrollPosition"; // Adjust path
-import { cn } from "../../lib/utils"; // Your classname utility
-
+import { useScrollPosition } from "../../hooks/useScrollPosition"; 
+import { cn } from "../../lib/utils"; 
 export function ScrollToTopButton() {
   const scrollPosition = useScrollPosition();
-
-  // Show the button only after scrolling down, e.g., 400 pixels.
   const isVisible = scrollPosition > 400;
-
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: "smooth", // For a smooth scrolling animation
+      behavior: "smooth", 
     });
   };
-
   return (
     <button
       onClick={scrollToTop}
