@@ -6,7 +6,6 @@ import {
   UsersIcon,
 } from "@heroicons/react/24/outline";
 import { useCurrentUser } from "../features/auth/queries";
-
 function AboutPage() {
   const { data: user } = useCurrentUser();
   return (
@@ -87,7 +86,7 @@ function AboutPage() {
           </div>
         </section>
 
-        {/* --- 4. Call to Action (CTA) Section --- */}
+        {/* --- Call to Action (CTA) Section --- */}
         {/* We only render this entire section if the user is NOT logged in */}
         {!user && (
           <section className="text-center bg-base-200 p-8 md:p-12 rounded-lg">
@@ -107,8 +106,6 @@ function AboutPage() {
     </div>
   );
 }
-
-// Create and export the route definition
 export const Route = createFileRoute("/about")({
   component: AboutPage,
 });

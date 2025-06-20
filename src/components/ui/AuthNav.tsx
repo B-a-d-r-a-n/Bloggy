@@ -1,20 +1,18 @@
 import { Link } from "@tanstack/react-router";
 import { getUserAvatar } from "../../lib/utils";
 import { useCurrentUser, useLogout } from "../../features/auth/queries";
-
 import toast from "react-hot-toast";
 import { api } from "../../lib/api";
 export function AuthNav() {
-  const { data: user } = useCurrentUser(); // <-- The new hook
+  const { data: user } = useCurrentUser(); 
   const logout = useLogout();
   const handleLogout = async () => {
     try {
       await logout();
       delete api.defaults.headers.common["Authorization"];
-      localStorage.removeItem("access_token"); // 👈 remove on logout
+      localStorage.removeItem("access_token"); 
     } catch (error) {
       console.error("Logout failed:", error);
-      // You might want to show a toast notification here
       toast.error("Logout failed, please try again");
     }
   };
@@ -30,7 +28,6 @@ export function AuthNav() {
       </>
     );
   }
-
   return (
     <div className="dropdown dropdown-end">
       <div

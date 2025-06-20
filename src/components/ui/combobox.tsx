@@ -1,22 +1,16 @@
 import { useState } from "react";
-
 import { Combobox as HeadlessCombobox } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
-
-// Define the shape of a single option
 export interface ComboboxOption {
   _id: string;
   name: string;
 }
-
-// Define the props for the component
 interface ComboboxProps {
   options: ComboboxOption[];
   value: ComboboxOption | null;
   onChange: (value: ComboboxOption | null) => void;
   placeholder?: string;
 }
-
 export default function Combobox({
   value,
   onChange,
@@ -24,14 +18,12 @@ export default function Combobox({
   placeholder,
 }: ComboboxProps) {
   const [query, setQuery] = useState("");
-
   const filteredOptions =
     query === ""
       ? options
       : options.filter((option) => {
           return option.name.toLowerCase().includes(query.toLowerCase());
         });
-
   return (
     <HeadlessCombobox value={value} onChange={onChange} nullable>
       <div className="relative">
@@ -67,12 +59,8 @@ export default function Combobox({
               >
                 {({ selected, active }) => (
                   <>
-                    {/* --- THIS IS THE FIX --- */}
-                    {/* 
-                      `block` ensures it takes the full width of the list item.
-                      `truncate` applies overflow:hidden, text-overflow:ellipsis, and whitespace:nowrap
-                      to prevent long category names from breaking the layout.
-                    */}
+                    {}
+                    {}
                     <span
                       className={`block truncate ${
                         selected ? "font-medium" : "font-normal"

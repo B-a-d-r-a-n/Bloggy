@@ -2,14 +2,12 @@ import React, { useId } from "react";
 import type { UseFormRegisterReturn } from "react-hook-form";
 import { cn } from "../../lib/utils";
 import { ExclamationCircleIcon } from "@heroicons/react/20/solid";
-
 interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   registration: UseFormRegisterReturn;
   error?: string;
   description?: string;
 }
-
 export function FormInput({
   label,
   registration,
@@ -20,7 +18,6 @@ export function FormInput({
 }: FormInputProps) {
   const id = useId();
   const errorId = `${id}-error`;
-
   return (
     <div>
       <label

@@ -5,11 +5,9 @@ import {
   useGetCategories,
   useGetTags,
 } from "../../shared/queries";
-
 import { FormInput } from "../../../components/ui/FormInput";
 import { FormTextArea } from "../../../components/ui/FormTextArea";
 import { FormFileInput } from "../../../components/ui/FormFileInput";
-
 import MultiSelectCombobox from "../../../components/ui/MultiSelectCombobox";
 import type { ArticleFull } from "../../../core/types/article";
 import { useMemo } from "react";
@@ -17,14 +15,12 @@ import type { Tag } from "../../../core/types/tag";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import Combobox from "../../../components/ui/combobox";
 import AdvancedRichTextEditor from "../editor/AdvancedRichTextEditor";
-
 interface ArticleFormProps {
   mode: "create" | "edit";
   initialData?: ArticleFull;
   onSubmit: (data: FormData) => void;
   isSubmitting: boolean;
 }
-
 export default function ArticleForm({
   mode,
   initialData,
@@ -39,7 +35,6 @@ export default function ArticleForm({
   const { data: tagsData = [], isLoading: isLoadingTags } = useGetTags();
   const createTagMutation = useCreateTag();
   const formSchema = useMemo(() => getArticleFormSchema(mode), [mode]);
-
   const {
     register,
     handleSubmit,
@@ -80,7 +75,6 @@ export default function ArticleForm({
       return null;
     }
   };
-
   const handleFormSubmit: SubmitHandler<ArticleFormValues> = (data) => {
     const formData = new FormData();
     const { tags, coverImage, ...restOfData } = data;
@@ -102,10 +96,8 @@ export default function ArticleForm({
         formData.append(key, value as string);
       }
     });
-
     onSubmit(formData);
   };
-
   return (
     <form
       onSubmit={handleSubmit(handleFormSubmit)}
@@ -115,7 +107,6 @@ export default function ArticleForm({
       <h1 className="text-3xl font-bold mb-8">
         {isEditMode ? "Edit Article" : "Create a New Article"}
       </h1>
-
       <FormInput
         label="Article Title"
         registration={register("title")}
@@ -123,7 +114,6 @@ export default function ArticleForm({
         disabled={isSubmitting}
         description="A catchy and descriptive title for your article."
       />
-
       <FormTextArea
         label="Summary"
         registration={register("summary")}
@@ -132,7 +122,7 @@ export default function ArticleForm({
         disabled={isSubmitting}
         description="A brief, one-paragraph summary that will appear in article lists."
       />
-      {/* For Controller-based components, we wrap them in a simple div */}
+      {}
       <div>
         <label className="block text-sm font-medium text-base-content/90 mb-1.5">
           Category
@@ -155,7 +145,6 @@ export default function ArticleForm({
           <p className="mt-2 text-sm text-error">{errors.category.message}</p>
         )}
       </div>
-
       <div>
         <label className="block text-sm font-medium text-base-content/90 mb-1.5">
           Tags
@@ -180,8 +169,7 @@ export default function ArticleForm({
           <p className="mt-2 text-sm text-error">{errors.tags.message}</p>
         )}
       </div>
-
-      {/* ... File Input and Rich Text Editor would follow the same pattern as Category/Tags ... */}
+      {}
       <div>
         <Controller
           name="coverImage"
@@ -217,7 +205,6 @@ export default function ArticleForm({
           <p className="mt-2 text-sm text-error">{errors.content.message}</p>
         )}
       </div>
-
       <div className="pt-4 border-t border-base-300">
         <button
           type="submit"

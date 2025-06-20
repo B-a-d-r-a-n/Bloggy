@@ -9,7 +9,6 @@ import {
 import { authKeys } from "../../features/auth/queries";
 import articleService from "../../core/services/articleService";
 import type { ArticleFull } from "../../core/types/article";
-
 const articleActionSearchSchema = z
   .object({
     mode: z.enum(["create", "edit"]),
@@ -18,7 +17,6 @@ const articleActionSearchSchema = z
   .refine((data) => (data.mode === "edit" ? !!data.articleId : true), {
     message: "Article ID is required for edit mode.",
   });
-
 export const Route = createFileRoute("/articles/action")({
   validateSearch: (search) => articleActionSearchSchema.parse(search),
   beforeLoad: async ({ context, location }) => {
@@ -29,7 +27,6 @@ export const Route = createFileRoute("/articles/action")({
       throw redirect({ to: "/login", search: { redirect: location.href } });
     }
   },
-
   loaderDeps: ({ search }) => ({
     mode: search.mode,
     articleId: search.articleId,
@@ -43,19 +40,14 @@ export const Route = createFileRoute("/articles/action")({
     }
     return null;
   },
-
   component: ArticleActionPage,
 });
 function ArticleActionPage() {
   const navigate = useNavigate();
-
   const { mode, articleId } = Route.useSearch();
-
   const initialData = Route.useLoaderData() as ArticleFull | null;
-
   const createMutation = useCreateArticle();
   const updateMutation = useUpdateArticle();
-
   const handleSubmit = (formData: FormData) => {
     if (mode === "edit" && articleId) {
       updateMutation.mutate(
@@ -80,11 +72,8 @@ function ArticleActionPage() {
       });
     }
   };
-
-  // You can still use a loading state from the route itself for the initial data fetch
   const { status } = Route.useMatch();
   const isInitialLoading = status === "pending";
-
   if (isInitialLoading) {
     return (
       <div className="py-12 text-center">
@@ -92,9 +81,7 @@ function ArticleActionPage() {
       </div>
     );
   }
-
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
-
   return (
     <div className="py-12">
       <ArticleForm

@@ -7,14 +7,11 @@ import {
   StarIcon,
 } from "@heroicons/react/24/outline";
 import type { Tag } from "../../../core/types/tag";
-
 interface ArticleCardProps {
   article: ArticleListItem;
 }
-
 export default function ArticleCard({ article }: ArticleCardProps) {
   if (!article || !article.author) return null;
-
   return (
     <div className="card w-full max-w-3xl bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 group">
       {article.coverImageUrl && (
@@ -28,7 +25,6 @@ export default function ArticleCard({ article }: ArticleCardProps) {
           </figure>
         </Link>
       )}
-
       <div className="card-body p-6 md:p-8">
         {/* Category and Tags */}
         <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -98,7 +94,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
         {/* Footer: Stats & Actions */}
         <div className="card-actions justify-between items-center mt-auto pt-4 border-t border-base-content/10">
           <div className="flex items-center gap-4 text-sm text-base-content/70">
-            {/* --- STAR COUNT --- */}
+            {}
             <div
               className="flex items-center gap-1.5"
               title={`${article.starsCount} stars`}
@@ -106,8 +102,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
               <StarIcon className="w-5 h-5" />
               <span className="font-medium">{article.starsCount}</span>
             </div>
-
-            {/* --- COMMENT COUNT --- */}
+            {}
             <div
               className="flex items-center gap-1.5"
               title={`${article.totalCommentCount} comments`}
@@ -116,7 +111,6 @@ export default function ArticleCard({ article }: ArticleCardProps) {
               <span className="font-medium">{article.totalCommentCount}</span>
             </div>
           </div>
-
           <ArticleActions articleId={article._id} author={article.author} />
         </div>
       </div>

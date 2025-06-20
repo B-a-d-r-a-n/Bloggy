@@ -1,50 +1,40 @@
-import { Link } from "@tanstack/react-router"; // <-- Import the Link component
+import { Link } from "@tanstack/react-router"; 
 import type { PopulatedComment } from "../../../core/types/comment";
 import { usePostReply, useDeleteComment, useUpdateComment } from "../queries";
 import CommentForm from "./CommentForm";
 import { getUserAvatar } from "../../../lib/utils";
 import { useCurrentUser } from "../../auth/queries";
 import { useState } from "react";
-
 interface CommentItemProps {
   comment: PopulatedComment;
   articleId: string;
 }
-
 export default function CommentItem({ comment, articleId }: CommentItemProps) {
   const { data: user } = useCurrentUser();
   const [isReplying, setIsReplying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-
   const postReplyMutation = usePostReply(articleId);
   const deleteCommentMutation = useDeleteComment(articleId);
   const updateCommentMutation = useUpdateComment(articleId);
-
   const isOwner = user?._id === comment.author._id;
-
   const handleReplySubmit = (text: string) => {
     postReplyMutation.mutate(
       { commentId: comment._id, text },
       { onSuccess: () => setIsReplying(false) }
     );
   };
-
   const handleDelete = () => {
     if (window.confirm("Are you sure you want to delete this comment?")) {
       deleteCommentMutation.mutate(comment._id);
     }
   };
-
   const handleUpdateSubmit = (text: string) => {
     updateCommentMutation.mutate(
       { commentId: comment._id, text },
       { onSuccess: () => setIsEditing(false) }
     );
   };
-
-  // Defensive check for missing author data
   if (!comment.author) return null;
-
   return (
     <div className="flex gap-3 items-start">
       <Link
@@ -59,7 +49,6 @@ export default function CommentItem({ comment, articleId }: CommentItemProps) {
           />
         </div>
       </Link>
-
       <div className="flex-1">
         <div className="bg-base-200 rounded-lg px-4 py-2">
           <div className="flex items-center gap-2">
@@ -74,7 +63,6 @@ export default function CommentItem({ comment, articleId }: CommentItemProps) {
               • {new Date(comment.createdAt).toLocaleDateString()}
             </span>
           </div>
-
           {isEditing ? (
             <div className="mt-2">
               <CommentForm
@@ -91,7 +79,6 @@ export default function CommentItem({ comment, articleId }: CommentItemProps) {
             </p>
           )}
         </div>
-
         {user && !isEditing && (
           <div className="flex items-center gap-2 text-xs font-medium text-base-content/60 pl-2 pt-1">
             <button
@@ -121,7 +108,6 @@ export default function CommentItem({ comment, articleId }: CommentItemProps) {
             )}
           </div>
         )}
-
         {isReplying && (
           <div className="mt-4">
             <CommentForm
@@ -132,7 +118,6 @@ export default function CommentItem({ comment, articleId }: CommentItemProps) {
             />
           </div>
         )}
-
         {comment.replies && comment.replies.length > 0 && (
           <div className="mt-4 pl-6 border-l-2 border-base-300 space-y-4">
             {comment.replies.map((reply) => (

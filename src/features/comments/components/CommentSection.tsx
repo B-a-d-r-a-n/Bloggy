@@ -3,12 +3,10 @@ import CommentForm from "./CommentForm";
 import { Link } from "@tanstack/react-router";
 import CommentItem from "./ComentItem";
 import { useCurrentUser } from "../../auth/queries";
-
 interface CommentSectionProps {
   articleId: string;
   totalCommentCount: number;
 }
-
 export default function CommentSection({
   articleId,
   totalCommentCount,
@@ -22,15 +20,11 @@ export default function CommentSection({
     fetchNextPage,
     isFetchingNextPage,
   } = useGetComments(articleId);
-
   const postCommentMutation = usePostComment(articleId);
-
   const handleCommentSubmit = (text: string) => {
     postCommentMutation.mutate(text);
   };
-
   const comments = data?.pages.flatMap((page) => page.data) ?? [];
-
   return (
     <div id="comment-section" className="space-y-8 max-w-4xl mx-auto">
       <h2 className="text-2xl font-bold border-b border-base-300 pb-4">

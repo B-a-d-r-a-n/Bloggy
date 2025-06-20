@@ -1,6 +1,5 @@
 import { api } from "../../lib/api";
 import type { User } from "../types/user";
-
 interface UserResponse {
   status: "success";
   data: { user: User };

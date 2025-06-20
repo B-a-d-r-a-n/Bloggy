@@ -6,7 +6,6 @@ import {
   type FieldValues,
   type Path,
 } from "react-hook-form";
-
 interface FormControlledProps<T extends FieldValues> {
   control: Control<T>;
   name: Path<T>;
@@ -17,7 +16,6 @@ interface FormControlledProps<T extends FieldValues> {
     value: any;
   }) => React.ReactElement;
 }
-
 export function FormControlled<T extends FieldValues>({
   control,
   name,
