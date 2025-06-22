@@ -3,13 +3,15 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginFormValues } from "../validation";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { FormInput } from "../../../components/ui/FormInput"; 
+import { FormInput } from "../../../components/ui/FormInput";
 import { FormGroup } from "../../../components/ui/FormGroup";
 import { useQueryClient } from "@tanstack/react-query";
 import { authKeys } from "../queries";
 import authService from "../../../core/services/authService";
 import { api } from "../../../lib/api";
 import toast from "react-hot-toast";
+import type { AxiosError } from "axios";
+import type { ApiErrorResponse } from "../../../core/types/api";
 export default function LoginForm() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -20,7 +22,7 @@ export default function LoginForm() {
     formState: { errors, isSubmitting },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    mode: "onBlur", 
+    mode: "onBlur",
   });
   const onSubmit: SubmitHandler<LoginFormValues> = async (data) => {
     setApiError(null);
@@ -34,7 +36,7 @@ export default function LoginForm() {
         delete api.defaults.headers.common["Authorization"];
       }
       if (accessToken) {
-        localStorage.setItem("access_token", accessToken); 
+        localStorage.setItem("access_token", accessToken);
         api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
       }
       try {
@@ -59,11 +61,12 @@ export default function LoginForm() {
           navigate({ to: "/", replace: true });
         }, 500);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Login error:", error);
       toast.dismiss(loadingToast);
+      const axiosError = error as AxiosError<ApiErrorResponse>;
       const errorMessage =
-        error.response?.data?.message || "Login failed. Please try again.";
+        axiosError.response?.data?.message || "Login failed. Please try again.";
       setApiError(errorMessage);
       toast.error(errorMessage);
     }

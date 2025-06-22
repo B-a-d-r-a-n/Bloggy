@@ -13,7 +13,7 @@ interface ArticleCardProps {
 export default function ArticleCard({ article }: ArticleCardProps) {
   if (!article || !article.author) return null;
   return (
-    <div className="card w-full max-w-3xl bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 group">
+    <div className="card w-full max-w-3xl bg-base-100 shadow-xl transition-all hover:shadow-2xl hover:-translate-y-1 group">
       {article.coverImageUrl && (
         <Link to="/articles/$articleId" params={{ articleId: article._id }}>
           <figure className="aspect-video bg-base-300">

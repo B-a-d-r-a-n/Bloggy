@@ -98,8 +98,9 @@ export default function ArticleActions({
         onConfirm={confirmDeletion}
         isConfirming={deleteMutation.isPending}
         title="Delete Article"
-        description="Are you sure you want to delete this article? All of its data will be permanently removed. This action cannot be undone."
-        confirmText="Yes, Delete"
+        description="Are you sure you want to delete this article? All of its content and comments will be permanently removed. This action cannot be undone."
+        confirmText="Yes, Delete Article"
+        intent="danger"
       />
     </>
   );

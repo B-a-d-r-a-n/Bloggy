@@ -25,6 +25,7 @@ const router = createRouter({
     queryClient,
   },
   defaultPreload: "intent",
+  scrollToTopSelectors: ["#main-scroll-container"],
 });
 
 declare module "@tanstack/react-router" {

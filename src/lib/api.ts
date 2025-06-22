@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { startNProgress, doneNProgress } from "./nprogress";
 import authService from "../core/services/authService";
 import { authKeys } from "../features/auth/queries";
@@ -6,13 +6,14 @@ import { queryClient } from "../main";
 
 let isRefreshing = false;
 let failedQueue: Array<{
-  resolve: (value: any) => void;
-  reject: (reason?: any) => void;
+  resolve: (value: string | null) => void;
+  reject: (reason?: unknown) => void;
 }> = [];
+
 const processQueue = (
   error: Error | null,
   token: string | null = null
-): any => {
+): void => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
@@ -22,6 +23,7 @@ const processQueue = (
   });
   failedQueue = [];
 };
+
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true,
@@ -29,11 +31,11 @@ export const api = axios.create({
 
 // --- Request Interceptor ---
 api.interceptors.request.use(
-  (config) => {
+  (config: InternalAxiosRequestConfig) => {
     startNProgress();
     return config;
   },
-  (error) => {
+  (error: AxiosError) => {
     doneNProgress();
     return Promise.reject(error);
   }
@@ -47,26 +49,28 @@ api.interceptors.response.use(
   },
   async (error: AxiosError) => {
     doneNProgress();
-    const originalRequest = error.config;
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retry?: boolean;
+    };
     if (
       error.response?.status === 401 &&
       originalRequest &&
-      !(originalRequest as any)._retry
+      !originalRequest._retry
     ) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
           .then((token) => {
-            (originalRequest as any).headers["Authorization"] =
-              `Bearer ${token}`;
+            originalRequest.headers = originalRequest.headers || {};
+            originalRequest.headers["Authorization"] = `Bearer ${token}`;
             return api(originalRequest);
           })
           .catch((err) => {
             return Promise.reject(err);
           });
       }
-      (originalRequest as any)._retry = true;
+      originalRequest._retry = true;
       isRefreshing = true;
       try {
         const response = await authService.refreshToken();
@@ -74,8 +78,8 @@ api.interceptors.response.use(
         localStorage.setItem("access_token", newAccessToken);
         api.defaults.headers.common["Authorization"] =
           `Bearer ${newAccessToken}`;
-        (originalRequest as any).headers["Authorization"] =
-          `Bearer ${newAccessToken}`;
+        originalRequest.headers = originalRequest.headers || {};
+        originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
         processQueue(null, newAccessToken);
         return api(originalRequest);
       } catch (refreshError) {

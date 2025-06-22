@@ -145,9 +145,10 @@ export default function CommentItem({ comment, articleId }: CommentItemProps) {
         onClose={() => setIsModalOpen(false)}
         onConfirm={confirmDeletion}
         isConfirming={deleteCommentMutation.isPending}
-        title="Delete Article"
-        description="Are you sure you want to delete this comment? All of its data will be permanently removed. This action cannot be undone."
+        title="Delete Comment"
+        description="Are you sure you want to permanently delete this comment?"
         confirmText="Yes, Delete"
+        intent="danger"
       />
     </>
   );

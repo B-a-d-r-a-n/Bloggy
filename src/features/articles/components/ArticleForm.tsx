@@ -15,6 +15,9 @@ import type { Tag } from "../../../core/types/tag";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import Combobox from "../../../components/ui/combobox";
 import AdvancedRichTextEditor from "../editor/AdvancedRichTextEditor";
+import type { AxiosError } from "axios";
+import type { ApiErrorResponse } from "../../../core/types/api";
+import toast from "react-hot-toast";
 interface ArticleFormProps {
   mode: "create" | "edit";
   initialData?: ArticleFull;
@@ -67,11 +70,12 @@ export default function ArticleForm({
     try {
       const response = await createTagMutation.mutateAsync(tagName);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to create tag:", error);
-      alert(
-        `Error: ${error.response?.data?.message || "Could not create tag"}`
-      );
+      const axiosError = error as AxiosError<ApiErrorResponse>;
+      const errorMessage =
+        axiosError.response?.data?.message || "Could not create tag";
+      toast.error(errorMessage);
       return null;
     }
   };
