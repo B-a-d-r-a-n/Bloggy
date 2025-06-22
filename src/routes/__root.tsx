@@ -6,12 +6,14 @@ import { ScrollToTopButton } from "../components/ui/ScrollToTopButton";
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import type { QueryClient } from "@tanstack/react-query";
 import { CustomToaster } from "../components/ui/CustomToaster";
+import BackgroundBubbles from "../components/ui/BackgroundBubbles";
 function RootComponent() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen relative isolate">
+      <BackgroundBubbles />
       <CustomToaster />
       <NavBar />
-      <main className="p-2 w-[80%] mx-auto flex-grow">
+      <main className="p-2 w-[95%] sm:w-[80%] mx-auto flex-grow">
         <Outlet />
       </main>
       <ScrollToTopButton />

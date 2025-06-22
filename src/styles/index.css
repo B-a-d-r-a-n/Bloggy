@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 @plugin "daisyui" {
   themes:
     garden --default,
@@ -159,4 +160,21 @@
 }
 #nprogress .bar {
   background: var(--color-primary) !important;
+}
+
+.bubble {
+  animation: rise 25s infinite linear;
+}
+
+@keyframes rise {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  100% {
+    /* 
+      Move the bubble up past the top of the viewport (100vh) plus its own size (150px)
+      and apply a gentle rotation.
+    */
+    transform: translateY(-150vh) rotate(360deg);
+  }
 }

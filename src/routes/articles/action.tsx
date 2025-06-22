@@ -9,6 +9,7 @@ import {
 import { authKeys } from "../../features/auth/queries";
 import articleService from "../../core/services/articleService";
 import type { ArticleFull } from "../../core/types/article";
+
 const articleActionSearchSchema = z
   .object({
     mode: z.enum(["create", "edit"]),
@@ -17,6 +18,7 @@ const articleActionSearchSchema = z
   .refine((data) => (data.mode === "edit" ? !!data.articleId : true), {
     message: "Article ID is required for edit mode.",
   });
+
 export const Route = createFileRoute("/articles/action")({
   validateSearch: (search) => articleActionSearchSchema.parse(search),
   beforeLoad: async ({ context, location }) => {
