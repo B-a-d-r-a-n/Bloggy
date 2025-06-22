@@ -15,6 +15,12 @@ interface AdvancedRichTextEditorProps {
   disabled?: boolean;
   placeholder?: string;
 }
+const configureMarked = () => {
+  marked.setOptions({
+    breaks: true,
+    gfm: true,
+  });
+};
 const AdvancedRichTextEditor = ({
   content = "",
   onChange,
@@ -30,6 +36,9 @@ const AdvancedRichTextEditor = ({
   const [undoIndex, setUndoIndex] = useState<number>(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  useEffect(() => {
+    configureMarked();
+  }, []);
   // Update word and character counts
   useEffect(() => {
     const words = text.trim() ? text.trim().split(/\s+/).length : 0;
@@ -104,10 +113,12 @@ const AdvancedRichTextEditor = ({
     (type: "bullet" | "number") => {
       const textarea = textareaRef.current;
       if (!textarea) return;
+
       const start = textarea.selectionStart;
       const lines = text.split("\n");
       let currentLine = 0;
       let charCount = 0;
+
       for (let i = 0; i < lines.length; i++) {
         if (charCount + lines[i].length >= start) {
           currentLine = i;
@@ -115,15 +126,19 @@ const AdvancedRichTextEditor = ({
         }
         charCount += lines[i].length + 1;
       }
+
       const prefix = type === "bullet" ? "• " : "1. ";
       const currentLineText = lines[currentLine];
-      if (currentLineText.match(/^(\• |[0-9]+\. )/)) {
+
+      // FIXED: Removed incorrect escape sequence
+      if (currentLineText.match(/^(• |[0-9]+\. )/)) {
         // Remove existing list formatting
-        lines[currentLine] = currentLineText.replace(/^(\• |[0-9]+\. )/, "");
+        lines[currentLine] = currentLineText.replace(/^(• |[0-9]+\. )/, "");
       } else {
         // Add list formatting
         lines[currentLine] = prefix + currentLineText;
       }
+
       const newText = lines.join("\n");
       setText(newText);
       onChange?.(newText);
@@ -156,11 +171,46 @@ const AdvancedRichTextEditor = ({
     if (!markdown?.trim()) {
       return "";
     }
-    const rawHtml = marked.parse(markdown) as string;
-    const cleanHtml = DOMPurify.sanitize(rawHtml);
-    return cleanHtml;
-  }, []);
 
+    try {
+      const rawHtml = marked.parse(markdown) as string;
+      const cleanHtml = DOMPurify.sanitize(rawHtml, {
+        ALLOWED_TAGS: [
+          "p",
+          "br",
+          "strong",
+          "em",
+          "u",
+          "s",
+          "code",
+          "pre",
+          "h1",
+          "h2",
+          "h3",
+          "h4",
+          "h5",
+          "h6",
+          "ul",
+          "ol",
+          "li",
+          "blockquote",
+          "a",
+          "img",
+          "table",
+          "thead",
+          "tbody",
+          "tr",
+          "th",
+          "td",
+        ],
+        ALLOWED_ATTR: ["href", "src", "alt", "title", "target", "rel"],
+      });
+      return cleanHtml;
+    } catch (error) {
+      console.error("Markdown conversion error:", error);
+      return `<p>Error rendering content: ${error instanceof Error ? error.message : "Unknown error"}</p>`;
+    }
+  }, []);
   // Keyboard shortcuts
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLTextAreaElement>): void => {

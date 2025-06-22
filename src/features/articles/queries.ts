@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import starService from "../../core/services/starService";
 import { userKeys } from "../profile/queries";
 import { useCurrentUser } from "../auth/queries";
+
 export const articleKeys = {
   all: ["articles"] as const,
   allLists: () => [...articleKeys.all, "list"] as const,
@@ -99,6 +100,7 @@ export const useUpdateArticle = () => {
     },
   });
 };
+
 export const useToggleStar = () => {
   const queryClient = useQueryClient();
   const { data: currentUser } = useCurrentUser();
@@ -145,7 +147,12 @@ export const useToggleStar = () => {
       });
     },
     onSettled: (data, error, articleId, context) => {
-      const authorId = (context as any)?.previousArticle?.author?._id;
+      const authorId = (
+        context as {
+          previousArticle: ArticleFull;
+          isCurrentlyStarred: boolean;
+        }
+      )?.previousArticle?.author?._id;
       console.log(data, error);
       queryClient.invalidateQueries({
         queryKey: articleKeys.detail(articleId),

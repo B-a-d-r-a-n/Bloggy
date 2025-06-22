@@ -44,9 +44,10 @@ function ArticleDetailPage() {
     );
   }
   return (
-    <div className="py-8 lg:py-12">
+    <div className="bg-base-100 py-8 lg:py-12 px-4 md:px-8 rounded-lg shadow-lg">
       <ArticleDetailDisplay article={article!} />
       {}
+      <div className="divider my-12"></div>
       <div className="max-w-4xl mx-auto mt-16">
         <CommentSection
           totalCommentCount={article!.totalCommentCount}
