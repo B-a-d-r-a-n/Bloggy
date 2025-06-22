@@ -5,17 +5,20 @@ import {
   type Control,
   type FieldValues,
   type Path,
+  type FieldPathValue,
 } from "react-hook-form";
+
 interface FormControlledProps<T extends FieldValues> {
   control: Control<T>;
   name: Path<T>;
   label: string;
   error?: string;
   children: (field: {
-    onChange: (...event: any[]) => void;
-    value: any;
+    onChange: (value: FieldPathValue<T, Path<T>>) => void;
+    value: FieldPathValue<T, Path<T>>;
   }) => React.ReactElement;
 }
+
 export function FormControlled<T extends FieldValues>({
   control,
   name,

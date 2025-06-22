@@ -9,7 +9,10 @@ import { CustomToaster } from "../components/ui/CustomToaster";
 import BackgroundBubbles from "../components/ui/BackgroundBubbles";
 function RootComponent() {
   return (
-    <div className="flex flex-col min-h-screen relative isolate">
+    <div
+      id="main-scroll-container"
+      className="flex flex-col min-h-screen relative isolate"
+    >
       <BackgroundBubbles />
       <CustomToaster />
       <NavBar />

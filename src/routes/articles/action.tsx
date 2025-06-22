@@ -9,6 +9,7 @@ import {
 import { authKeys } from "../../features/auth/queries";
 import articleService from "../../core/services/articleService";
 import type { ArticleFull } from "../../core/types/article";
+import { usePageTitle } from "../../hooks/usePageTitle";
 
 const articleActionSearchSchema = z
   .object({
@@ -47,6 +48,9 @@ export const Route = createFileRoute("/articles/action")({
 function ArticleActionPage() {
   const navigate = useNavigate();
   const { mode, articleId } = Route.useSearch();
+  usePageTitle({
+    title: `${mode} an article`,
+  });
   const initialData = Route.useLoaderData() as ArticleFull | null;
   const createMutation = useCreateArticle();
   const updateMutation = useUpdateArticle();

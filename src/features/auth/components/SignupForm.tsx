@@ -3,12 +3,15 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signupSchema, type SignupFormValues } from "../validation";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { FormInput } from "../../../components/ui/FormInput"; 
+import { FormInput } from "../../../components/ui/FormInput";
 import authService from "../../../core/services/authService";
 import { authKeys } from "../queries";
 import { useQueryClient } from "@tanstack/react-query";
 import { api } from "../../../lib/api";
 import toast from "react-hot-toast";
+import type { AxiosError } from "axios";
+import type { ApiErrorResponse } from "../../../core/types/api";
+
 export default function SignupForm() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -33,7 +36,7 @@ export default function SignupForm() {
         delete api.defaults.headers.common["Authorization"];
       }
       if (accessToken) {
-        localStorage.setItem("access_token", accessToken); 
+        localStorage.setItem("access_token", accessToken);
         api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
       }
       try {
@@ -60,11 +63,13 @@ export default function SignupForm() {
           navigate({ to: "/", replace: true });
         }, 500);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Signup error:", error);
       toast.dismiss(loadingToast);
+      const axiosError = error as AxiosError<ApiErrorResponse>;
       const errorMessage =
-        error.response?.data?.message || "Signup failed. Please try again.";
+        axiosError.response?.data?.message ||
+        "Signup failed. Please try again.";
       setApiError(errorMessage);
       toast.error(errorMessage);
     }

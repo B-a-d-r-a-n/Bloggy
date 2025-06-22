@@ -9,6 +9,7 @@ import type { ArticleFull } from "../../../core/types/article";
 import { Link } from "@tanstack/react-router";
 import { marked } from "marked";
 import StarButton from "./StarButton";
+import { usePageTitle } from "../../../hooks/usePageTitle";
 
 interface ArticleDetailDisplayProps {
   article: ArticleFull;
@@ -17,6 +18,10 @@ interface ArticleDetailDisplayProps {
 export default function ArticleDetailDisplay({
   article,
 }: ArticleDetailDisplayProps) {
+  // Dynamic title update
+  usePageTitle({
+    title: article.title,
+  });
   const renderMarkdown = (content: string): string => {
     if (!content?.trim()) {
       return "<p>No content available.</p>";
@@ -24,8 +29,20 @@ export default function ArticleDetailDisplay({
 
     try {
       const rawHtml = marked.parse(content) as string;
-      const cleanHtml = DOMPurify.sanitize(rawHtml);
-      return cleanHtml;
+
+      // Enhanced sanitization with image size control
+      const cleanHtml = DOMPurify.sanitize(rawHtml, {
+        ADD_ATTR: ["style"],
+        ALLOWED_ATTR: ["href", "src", "alt", "title", "class", "style"],
+      });
+
+      // Process images to ensure consistent sizing
+      const processedHtml = cleanHtml.replace(
+        /<img([^>]*)>/g,
+        '<img$1 style="max-width: 100%; height: auto; width: auto; max-height: 500px; object-fit: contain; margin: 1rem auto; display: block; border-radius: 8px;">'
+      );
+
+      return processedHtml;
     } catch (error) {
       console.error("Error rendering article content:", error);
       return `<div class="alert alert-error"><p>Error displaying content.</p></div>`;
@@ -55,7 +72,7 @@ export default function ArticleDetailDisplay({
         </p>
       </header>
 
-      {/* Cover Image */}
+      {/* Cover Image with Fixed Sizing */}
       {article.coverImageUrl && (
         <figure className="mb-8 lg:mb-12 rounded-lg overflow-hidden shadow-lg">
           <div className="aspect-video bg-base-300">
@@ -134,7 +151,7 @@ export default function ArticleDetailDisplay({
 
       {/* 
         CRITICAL FIX: Enhanced prose classes for proper markdown styling
-        The key is using the right combination of prose classes
+        + Image sizing control through inline styles in renderMarkdown
       */}
       <div
         className="
@@ -195,6 +212,12 @@ export default function ArticleDetailDisplay({
           prose-a:text-primary
           prose-a:no-underline
           hover:prose-a:underline
+
+          prose-img:max-w-full
+          prose-img:h-auto
+          prose-img:mx-auto
+          prose-img:rounded-lg
+          prose-img:shadow-md
         "
         dangerouslySetInnerHTML={{ __html: renderMarkdown(article.content) }}
       />

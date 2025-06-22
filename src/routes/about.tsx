@@ -6,8 +6,10 @@ import {
   UsersIcon,
 } from "@heroicons/react/24/outline";
 import { useCurrentUser } from "../features/auth/queries";
+import { useRouteTitle } from "../hooks/usePageTitle";
 function AboutPage() {
   const { data: user } = useCurrentUser();
+  useRouteTitle("About us");
   return (
     <div className="bg-base-100 py-12 md:py-20">
       <div className="max-w-4xl mx-auto px-4 space-y-16">
