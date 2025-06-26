@@ -1,9 +1,9 @@
 import type { ReactNode } from "@tanstack/react-router";
 interface EmptyStateProps {
-  icon: ReactNode; 
+  icon: ReactNode;
   title: string;
   description: string;
-  action?: ReactNode; 
+  action?: ReactNode;
 }
 export default function EmptyState({
   icon,
@@ -12,7 +12,7 @@ export default function EmptyState({
   action,
 }: EmptyStateProps) {
   return (
-    <div className="text-center bg-base-200 p-8 rounded-lg border-2 border-dashed border-base-300">
+    <div className="text-center bg-base-200 p-8 w-full rounded-lg border-2 border-dashed border-base-300">
       <div className="inline-block p-4 bg-base-300/50 rounded-full mb-4">
         {}
         <div className="text-primary w-12 h-12">{icon}</div>

@@ -19,6 +19,9 @@ import { Route as IndexImport } from './routes/index'
 import { Route as ProfileUserIdImport } from './routes/profile/$userId'
 import { Route as ArticlesActionImport } from './routes/articles/action'
 import { Route as ArticlesArticleIdImport } from './routes/articles/$articleId'
+import { Route as ProfileUserIdIndexImport } from './routes/profile/$userId/index'
+import { Route as ProfileUserIdStarredImport } from './routes/profile/$userId/starred'
+import { Route as ProfileUserIdCommentsImport } from './routes/profile/$userId/comments'
 
 // Create/Update Routes
 
@@ -68,6 +71,24 @@ const ArticlesArticleIdRoute = ArticlesArticleIdImport.update({
   id: '/articles/$articleId',
   path: '/articles/$articleId',
   getParentRoute: () => rootRoute,
+} as any)
+
+const ProfileUserIdIndexRoute = ProfileUserIdIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProfileUserIdRoute,
+} as any)
+
+const ProfileUserIdStarredRoute = ProfileUserIdStarredImport.update({
+  id: '/starred',
+  path: '/starred',
+  getParentRoute: () => ProfileUserIdRoute,
+} as any)
+
+const ProfileUserIdCommentsRoute = ProfileUserIdCommentsImport.update({
+  id: '/comments',
+  path: '/comments',
+  getParentRoute: () => ProfileUserIdRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -130,10 +151,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileUserIdImport
       parentRoute: typeof rootRoute
     }
+    '/profile/$userId/comments': {
+      id: '/profile/$userId/comments'
+      path: '/comments'
+      fullPath: '/profile/$userId/comments'
+      preLoaderRoute: typeof ProfileUserIdCommentsImport
+      parentRoute: typeof ProfileUserIdImport
+    }
+    '/profile/$userId/starred': {
+      id: '/profile/$userId/starred'
+      path: '/starred'
+      fullPath: '/profile/$userId/starred'
+      preLoaderRoute: typeof ProfileUserIdStarredImport
+      parentRoute: typeof ProfileUserIdImport
+    }
+    '/profile/$userId/': {
+      id: '/profile/$userId/'
+      path: '/'
+      fullPath: '/profile/$userId/'
+      preLoaderRoute: typeof ProfileUserIdIndexImport
+      parentRoute: typeof ProfileUserIdImport
+    }
   }
 }
 
 // Create and export the route tree
+
+interface ProfileUserIdRouteChildren {
+  ProfileUserIdCommentsRoute: typeof ProfileUserIdCommentsRoute
+  ProfileUserIdStarredRoute: typeof ProfileUserIdStarredRoute
+  ProfileUserIdIndexRoute: typeof ProfileUserIdIndexRoute
+}
+
+const ProfileUserIdRouteChildren: ProfileUserIdRouteChildren = {
+  ProfileUserIdCommentsRoute: ProfileUserIdCommentsRoute,
+  ProfileUserIdStarredRoute: ProfileUserIdStarredRoute,
+  ProfileUserIdIndexRoute: ProfileUserIdIndexRoute,
+}
+
+const ProfileUserIdRouteWithChildren = ProfileUserIdRoute._addFileChildren(
+  ProfileUserIdRouteChildren,
+)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -143,7 +201,10 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/articles/$articleId': typeof ArticlesArticleIdRoute
   '/articles/action': typeof ArticlesActionRoute
-  '/profile/$userId': typeof ProfileUserIdRoute
+  '/profile/$userId': typeof ProfileUserIdRouteWithChildren
+  '/profile/$userId/comments': typeof ProfileUserIdCommentsRoute
+  '/profile/$userId/starred': typeof ProfileUserIdStarredRoute
+  '/profile/$userId/': typeof ProfileUserIdIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -154,7 +215,9 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/articles/$articleId': typeof ArticlesArticleIdRoute
   '/articles/action': typeof ArticlesActionRoute
-  '/profile/$userId': typeof ProfileUserIdRoute
+  '/profile/$userId/comments': typeof ProfileUserIdCommentsRoute
+  '/profile/$userId/starred': typeof ProfileUserIdStarredRoute
+  '/profile/$userId': typeof ProfileUserIdIndexRoute
 }
 
 export interface FileRoutesById {
@@ -166,7 +229,10 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/articles/$articleId': typeof ArticlesArticleIdRoute
   '/articles/action': typeof ArticlesActionRoute
-  '/profile/$userId': typeof ProfileUserIdRoute
+  '/profile/$userId': typeof ProfileUserIdRouteWithChildren
+  '/profile/$userId/comments': typeof ProfileUserIdCommentsRoute
+  '/profile/$userId/starred': typeof ProfileUserIdStarredRoute
+  '/profile/$userId/': typeof ProfileUserIdIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -180,6 +246,9 @@ export interface FileRouteTypes {
     | '/articles/$articleId'
     | '/articles/action'
     | '/profile/$userId'
+    | '/profile/$userId/comments'
+    | '/profile/$userId/starred'
+    | '/profile/$userId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -189,6 +258,8 @@ export interface FileRouteTypes {
     | '/signup'
     | '/articles/$articleId'
     | '/articles/action'
+    | '/profile/$userId/comments'
+    | '/profile/$userId/starred'
     | '/profile/$userId'
   id:
     | '__root__'
@@ -200,6 +271,9 @@ export interface FileRouteTypes {
     | '/articles/$articleId'
     | '/articles/action'
     | '/profile/$userId'
+    | '/profile/$userId/comments'
+    | '/profile/$userId/starred'
+    | '/profile/$userId/'
   fileRoutesById: FileRoutesById
 }
 
@@ -211,7 +285,7 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   ArticlesArticleIdRoute: typeof ArticlesArticleIdRoute
   ArticlesActionRoute: typeof ArticlesActionRoute
-  ProfileUserIdRoute: typeof ProfileUserIdRoute
+  ProfileUserIdRoute: typeof ProfileUserIdRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -222,7 +296,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   ArticlesArticleIdRoute: ArticlesArticleIdRoute,
   ArticlesActionRoute: ArticlesActionRoute,
-  ProfileUserIdRoute: ProfileUserIdRoute,
+  ProfileUserIdRoute: ProfileUserIdRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -267,7 +341,24 @@ export const routeTree = rootRoute
       "filePath": "articles/action.tsx"
     },
     "/profile/$userId": {
-      "filePath": "profile/$userId.tsx"
+      "filePath": "profile/$userId.tsx",
+      "children": [
+        "/profile/$userId/comments",
+        "/profile/$userId/starred",
+        "/profile/$userId/"
+      ]
+    },
+    "/profile/$userId/comments": {
+      "filePath": "profile/$userId/comments.tsx",
+      "parent": "/profile/$userId"
+    },
+    "/profile/$userId/starred": {
+      "filePath": "profile/$userId/starred.tsx",
+      "parent": "/profile/$userId"
+    },
+    "/profile/$userId/": {
+      "filePath": "profile/$userId/index.tsx",
+      "parent": "/profile/$userId"
     }
   }
 }
