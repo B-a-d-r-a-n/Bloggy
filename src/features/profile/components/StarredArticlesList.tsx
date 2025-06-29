@@ -3,8 +3,14 @@ import ArticleCard from "../../articles/components/ArticleCard";
 import EmptyState from "../../../components/ui/EmptyState";
 import { StarIcon } from "@heroicons/react/24/outline";
 
-export default function StarredArticlesList() {
-  const { data: articles, isLoading } = useGetStarredArticles();
+interface StarredArticlesListProps {
+  userId: string;
+}
+
+export default function StarredArticlesList({
+  userId,
+}: StarredArticlesListProps) {
+  const { data: articles, isLoading } = useGetStarredArticles(userId);
 
   if (isLoading) {
     return (

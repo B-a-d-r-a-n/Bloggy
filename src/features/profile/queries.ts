@@ -7,9 +7,10 @@ import type { User } from "../../core/types/user";
 export const userKeys = {
   all: ["users"] as const,
   detail: (userId: string) => [...userKeys.all, "detail", userId] as const,
-  myComments: () => [...userKeys.all, "me", "comments"] as const,
-  myStarred: () => [...userKeys.all, "me", "starred"] as const,
+  comments: (userId: string) => [...userKeys.all, "comments", userId] as const,
+  starred: (userId: string) => [...userKeys.all, "starred", userId] as const,
 };
+
 export const useGetUserProfile = (userId: string) => {
   return useQuery({
     queryKey: userKeys.detail(userId),
@@ -51,18 +52,20 @@ export const useUpdateUser = () => {
   });
 };
 
-export const useGetUserComments = () => {
+export const useGetUserComments = (userId: string) => {
   return useQuery({
-    queryKey: userKeys.myComments(),
-    queryFn: () => userService.getUserComments(),
+    queryKey: userKeys.comments(userId),
+    queryFn: () => userService.getUserComments(userId),
+    enabled: !!userId,
     select: (data) => data.data,
   });
 };
 
-export const useGetStarredArticles = () => {
+export const useGetStarredArticles = (userId: string) => {
   return useQuery({
-    queryKey: userKeys.myStarred(),
-    queryFn: () => userService.getStarredArticles(),
+    queryKey: userKeys.starred(userId),
+    queryFn: () => userService.getStarredArticles(userId),
+    enabled: !!userId,
     select: (data) => data.data,
   });
 };

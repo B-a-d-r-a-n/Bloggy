@@ -3,7 +3,8 @@ import { PlusIcon } from "@heroicons/react/24/solid";
 import { useCurrentUser } from "../../features/auth/queries";
 export function FloatingCreateButton() {
   const { data: user } = useCurrentUser();
-  if (!user) {
+  //todo:manage author status
+  if (!user /*|| (user.role !== "author" && user.role !== "admin")*/) {
     return null;
   }
   return (
