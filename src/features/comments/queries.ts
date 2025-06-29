@@ -6,6 +6,7 @@ import {
 import toast from "react-hot-toast";
 import commentService from "../../core/services/commentService";
 import { userKeys } from "../profile/queries";
+import { useCurrentUser } from "../auth/queries";
 
 export const commentKeys = {
   all: (articleId: string) => ["comments", articleId] as const,
@@ -28,6 +29,7 @@ export const useGetComments = (articleId: string) => {
 };
 
 export const usePostComment = (articleId: string) => {
+  const { data: user } = useCurrentUser();
   const queryClient = useQueryClient();
   const listKey = commentKeys.lists(articleId);
 
@@ -39,7 +41,7 @@ export const usePostComment = (articleId: string) => {
 
       toast.success("Comment posted successfully!");
       queryClient.invalidateQueries({ queryKey: listKey });
-      queryClient.invalidateQueries({ queryKey: userKeys.myComments() });
+      queryClient.invalidateQueries({ queryKey: userKeys.comments(user!._id) });
     },
     onError: (error: Error) => {
       toast.error(error.message || "Failed to post comment. Please try again.");
@@ -48,6 +50,7 @@ export const usePostComment = (articleId: string) => {
 };
 
 export const usePostReply = (articleId: string) => {
+  const { data: user } = useCurrentUser();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -56,7 +59,7 @@ export const usePostReply = (articleId: string) => {
     onSuccess: () => {
       toast.success("Reply posted successfully!");
       queryClient.invalidateQueries({ queryKey: commentKeys.lists(articleId) });
-      queryClient.invalidateQueries({ queryKey: userKeys.myComments() });
+      queryClient.invalidateQueries({ queryKey: userKeys.comments(user!._id) });
     },
     onError: (error: Error) => {
       toast.error(error.message || "Failed to post reply. Please try again.");
@@ -65,6 +68,7 @@ export const usePostReply = (articleId: string) => {
 };
 
 export const useUpdateComment = (articleId: string) => {
+  const { data: user } = useCurrentUser();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -73,7 +77,7 @@ export const useUpdateComment = (articleId: string) => {
     onSuccess: () => {
       toast.success("Comment updated successfully!");
       queryClient.invalidateQueries({ queryKey: commentKeys.lists(articleId) });
-      queryClient.invalidateQueries({ queryKey: userKeys.myComments() });
+      queryClient.invalidateQueries({ queryKey: userKeys.comments(user!._id) });
     },
     onError: (error: Error) => {
       toast.error(
@@ -84,6 +88,7 @@ export const useUpdateComment = (articleId: string) => {
 };
 
 export const useDeleteComment = (articleId: string) => {
+  const { data: user } = useCurrentUser();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -91,7 +96,7 @@ export const useDeleteComment = (articleId: string) => {
     onSuccess: () => {
       toast.success("Comment deleted successfully!");
       queryClient.invalidateQueries({ queryKey: commentKeys.lists(articleId) });
-      queryClient.invalidateQueries({ queryKey: userKeys.myComments() });
+      queryClient.invalidateQueries({ queryKey: userKeys.comments(user!._id) });
     },
     onError: (error: Error) => {
       toast.error(

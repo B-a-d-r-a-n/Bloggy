@@ -2,9 +2,11 @@ import { useGetUserComments } from "../queries";
 import { Link } from "@tanstack/react-router";
 import EmptyState from "../../../components/ui/EmptyState";
 import { ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
-
-export default function UserCommentsList() {
-  const { data: comments, isLoading } = useGetUserComments();
+interface UserCommentsListProps {
+  userId: string;
+}
+export default function UserCommentsList({ userId }: UserCommentsListProps) {
+  const { data: comments, isLoading } = useGetUserComments(userId);
 
   if (isLoading) {
     return (

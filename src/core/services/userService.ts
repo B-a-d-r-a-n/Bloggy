@@ -33,23 +33,23 @@ class UserService {
     return response.data;
   }
 
-  async getUserComments(): Promise<{
+  async getUserComments(userId: string): Promise<{
     status: string;
     data: PopulatedComment[];
   }> {
     const response = await api.get<{
       status: string;
       data: PopulatedComment[];
-    }>("/api/v1/users/me/comments");
+    }>(`/api/v1/users/${userId}/comments`);
     return response.data;
   }
 
-  async getStarredArticles(): Promise<{
+  async getStarredArticles(userId: string): Promise<{
     status: string;
     data: ArticleListItem[];
   }> {
     const response = await api.get<{ status: string; data: ArticleListItem[] }>(
-      "/api/v1/users/me/starred-articles"
+      `/api/v1/users/${userId}/starred`
     );
     return response.data;
   }

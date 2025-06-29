@@ -133,7 +133,9 @@ export const useToggleStar = () => {
           : previousArticle.starsCount + 1,
       });
       if (currentUser) {
-        queryClient.invalidateQueries({ queryKey: userKeys.myStarred() });
+        queryClient.invalidateQueries({
+          queryKey: userKeys.starred(currentUser._id),
+        });
       }
       return { previousArticle, isCurrentlyStarred };
     },

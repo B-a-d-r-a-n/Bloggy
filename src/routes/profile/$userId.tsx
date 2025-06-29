@@ -26,27 +26,52 @@ function ProfilePage() {
 
   const isOwnProfile = currentUser?._id === profileUser._id;
 
+  // --- Determine what content to show based on the viewed user's role ---
+  const isAuthor =
+    profileUser.role === "author" || profileUser.role === "admin";
+
   return (
     <div className="py-12 max-w-4xl mx-auto space-y-12">
       <ProfileDisplay user={profileUser} isOwnProfile={isOwnProfile} />
-      {isOwnProfile ? (
-        <div>
-          <ProfileNav userId={userId} />
-          <div className="mt-8">
-            <Outlet />
-          </div>
-        </div>
-      ) : (
+
+      {/* If the profile belongs to an author, show their articles by default */}
+      {isAuthor && (
         <ProfileArticleList
           isOwnProfile={isOwnProfile}
-          authorId={userId}
+          authorId={profileUser._id}
           authorName={profileUser.name}
         />
       )}
+
+      <div>
+        <h3 className="text-2xl font-bold mb-6">User Activity</h3>
+        <ProfileNav userId={userId} /> {/* The nav can be shown for any user */}
+        <div className="mt-8">
+          <Outlet />
+        </div>
+      </div>
+
+      {/* --- "Apply to be an Author" button --- */}
+      {/* fix the apply button and application for author in general */}
+      {/* {isOwnProfile &&
+        profileUser.role === "reader" &&
+        profileUser.authorStatus === "none" && (
+          <div className="text-center p-8 bg-base-200 rounded-lg">
+            <h3 className="text-xl font-bold">Want to share your story?</h3>
+            <p className="my-2">Apply to become an author on Bloggy.</p>
+            <button className="btn btn-primary">Apply Now</button>
+          </div>
+        )}
+      {isOwnProfile && profileUser.authorStatus === "pending" && (
+        <div className="text-center p-8 bg-base-200 rounded-lg">
+          <p className="font-semibold">
+            Your author application is pending review.
+          </p>
+        </div>
+      )} */}
     </div>
   );
 }
-
 export const Route = createFileRoute("/profile/$userId")({
   component: ProfilePage,
 });

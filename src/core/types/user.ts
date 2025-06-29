@@ -5,9 +5,11 @@ export interface User {
   name: string;
   email: string;
   address: string;
-  role: "user" | "admin";
+  role: "reader" | "author" | "admin";
   avatarUrl?: string;
   totalStars?: number;
+  authorStatus: string;
+  authorApplicationMessage: string;
   starredArticles?: { status: string; data: ArticleFull[] };
   createdAt: string;
   updatedAt: string;
