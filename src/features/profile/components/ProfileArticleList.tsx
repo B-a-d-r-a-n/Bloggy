@@ -24,14 +24,14 @@ export default function ProfileArticleList({
   const totalArticles = data?.pages[0]?.pagination.totalItems ?? 0;
   if (isLoading) {
     return (
-      <div className="mt-16 text-center">
+      <div className="space-y-8 text-center">
         <span className="loading loading-spinner loading-lg"></span>
       </div>
     );
   }
   if (isError) {
     return (
-      <p className="mt-16 text-center text-error">
+      <p className="space-y-8 text-center text-error">
         Could not load articles for this user.
       </p>
     );
@@ -39,7 +39,7 @@ export default function ProfileArticleList({
   if (totalArticles === 0) {
     if (isOwnProfile) {
       return (
-        <div className="mt-16">
+        <div className="space-y-8">
           <EmptyState
             icon={<PencilSquareIcon />}
             title="You haven't written any articles yet"
@@ -57,9 +57,8 @@ export default function ProfileArticleList({
         </div>
       );
     } else {
-      // Message for a visitor viewing someone else's empty profile
       return (
-        <div className="mt-16">
+        <div className="space-y-8">
           <EmptyState
             icon={<NewspaperIcon />}
             title="No Articles Published"
@@ -70,10 +69,7 @@ export default function ProfileArticleList({
     }
   }
   return (
-    <div className="mt-16">
-      <h3 className="text-2xl font-bold mb-6 text-center sm:text-left">
-        {isOwnProfile ? "Your Articles" : `Articles by ${authorName}`}
-      </h3>
+    <div className="space-y-8">
       <ArticleList
         data={data}
         isLoading={isLoading}
