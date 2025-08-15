@@ -1,11 +1,15 @@
-import { useGetUserComments } from "../queries";
 import { Link } from "@tanstack/react-router";
-import EmptyState from "../../../components/ui/EmptyState";
 import { ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
+import { useGetUserComments } from "../queries";
+import EmptyState from "../../../components/ui/EmptyState";
+
 interface UserCommentsListProps {
   userId: string;
+  isOwnProfile: boolean;
+  userName?: string;
 }
-export default function UserCommentsList({ userId }: UserCommentsListProps) {
+
+export default function UserCommentsList({ userId, isOwnProfile, userName }: UserCommentsListProps) {
   const { data: comments, isLoading } = useGetUserComments(userId);
 
   if (isLoading) {
@@ -20,8 +24,8 @@ export default function UserCommentsList({ userId }: UserCommentsListProps) {
     return (
       <EmptyState
         icon={<ChatBubbleLeftRightIcon />}
-        title="No Comments Yet"
-        description="Your comments on other articles will appear here."
+        title={isOwnProfile ? "No Comments Yet" : `${userName || "User"} hasn't commented yet`}
+        description={isOwnProfile ? "Your comments on other articles will appear here." : "Check back later for comments from this user."}
       />
     );
   }
@@ -38,7 +42,7 @@ export default function UserCommentsList({ userId }: UserCommentsListProps) {
                 params={{ articleId: comment.article }}
                 className="link link-primary font-semibold text-sm"
               >
-                View article ?
+                View article
               </Link>
             </div>
           </div>
