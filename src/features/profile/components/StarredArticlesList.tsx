@@ -5,10 +5,14 @@ import { StarIcon } from "@heroicons/react/24/outline";
 
 interface StarredArticlesListProps {
   userId: string;
+  isOwnProfile: boolean;
+  userName?: string;
 }
 
 export default function StarredArticlesList({
   userId,
+  isOwnProfile,
+  userName,
 }: StarredArticlesListProps) {
   const { data: articles, isLoading } = useGetStarredArticles(userId);
 
@@ -24,8 +28,16 @@ export default function StarredArticlesList({
     return (
       <EmptyState
         icon={<StarIcon />}
-        title="No Starred Articles"
-        description="Articles you star will be collected here for easy access."
+        title={
+          isOwnProfile
+            ? "No Starred Articles"
+            : `${userName || "User"} hasn't starred any articles yet`
+        }
+        description={
+          isOwnProfile
+            ? "Articles you star will be collected here for easy access."
+            : "Check back later for starred articles from this user."
+        }
       />
     );
   }

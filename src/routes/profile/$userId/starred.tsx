@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import StarredArticlesList from "../../../features/profile/components/StarredArticlesList";
+import { useGetUserProfile } from "../../../features/profile/queries";
+import { useCurrentUser } from "../../../features/auth/queries";
 
 export const Route = createFileRoute("/profile/$userId/starred")({
   component: UserArticlesComponent,
@@ -7,9 +9,16 @@ export const Route = createFileRoute("/profile/$userId/starred")({
 
 function UserArticlesComponent() {
   const { userId } = Route.useParams();
+  const { data: currentUser } = useCurrentUser();
+  const { data: profileUser } = useGetUserProfile(userId);
+
+  const isOwnProfile = currentUser?._id === profileUser?._id;
+
   return (
-    <div className="flex items-center justify-center">
-      <StarredArticlesList userId={userId} />
-    </div>
+    <StarredArticlesList
+      userId={userId}
+      isOwnProfile={isOwnProfile}
+      userName={profileUser?.name}
+    />
   );
 }

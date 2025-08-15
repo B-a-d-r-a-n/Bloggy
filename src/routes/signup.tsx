@@ -1,20 +1,11 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import SignupForm from "../features/auth/components/SignupForm";
-import { authKeys } from "../features/auth/queries";
 import { useRouteTitle } from "../hooks/usePageTitle";
+
 export const Route = createFileRoute("/signup")({
-  beforeLoad: ({ context }) => {
-    const user = context.queryClient.getQueryData(authKeys.me);
-    if (user) {
-      console.log("User is already logged in, redirecting from /signup");
-      throw redirect({
-        to: "/",
-        replace: true,
-      });
-    }
-  },
   component: SignupPage,
 });
+
 function SignupPage() {
   useRouteTitle("Signup");
   return (

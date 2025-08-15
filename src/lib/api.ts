@@ -3,6 +3,7 @@ import { startNProgress, doneNProgress } from "./nprogress";
 import authService from "../core/services/authService";
 import { authKeys } from "../features/auth/queries";
 import { queryClient } from "../main";
+import { syncAuthHeaders } from "../main";
 
 let isRefreshing = false;
 let failedQueue: Array<{
@@ -88,9 +89,12 @@ api.interceptors.response.use(
         } else {
           processQueue(new Error("An unknown refresh error occurred"), null);
         }
+        // Clear both API headers and localStorage for proper synchronization
         queryClient.setQueryData(authKeys.me, null);
         queryClient.removeQueries({ queryKey: authKeys.me });
         delete api.defaults.headers.common["Authorization"];
+        localStorage.removeItem("access_token");
+        syncAuthHeaders();
         if (window.location.pathname !== "/login") {
           window.location.href = "/login";
         }

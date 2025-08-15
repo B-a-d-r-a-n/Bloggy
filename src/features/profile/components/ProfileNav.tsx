@@ -20,6 +20,7 @@ export default function ProfileNav({ userId }: ProfileNavProps) {
   const { data: profileUser } = useGetUserProfile(userId);
 
   const isOwnProfile = currentUser?._id === profileUser?._id;
+  
   return (
     <div
       role="tablist"
@@ -45,9 +46,8 @@ export default function ProfileNav({ userId }: ProfileNavProps) {
       >
         <ChatBubbleBottomCenterTextIcon className="w-6 h-6" />
         <span className="hidden sm:block">
-          {" "}
-          {isOwnProfile ? "My comments" : `${profileUser?.name} comments`}
-        </span>{" "}
+          {isOwnProfile ? "My comments" : `${profileUser?.name}'s comments`}
+        </span>
       </Link>
       <Link
         to="/profile/$userId/starred"
@@ -57,7 +57,7 @@ export default function ProfileNav({ userId }: ProfileNavProps) {
       >
         <StarIcon className="w-6 h-6" />
         <span className="hidden sm:block">
-          {isOwnProfile ? "My stars" : `${profileUser?.name} stars`}
+          {isOwnProfile ? "My stars" : `${profileUser?.name}'s stars`}
         </span>
       </Link>
     </div>
