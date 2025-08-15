@@ -44,11 +44,15 @@ export default function LoginForm() {
         const userData = userResponse.data.user;
         queryClient.setQueryData(authKeys.me, userData);
         console.log("User data set in cache:", userData);
+
+        // Also invalidate the query to ensure fresh data is fetched everywhere
+        await queryClient.invalidateQueries({ queryKey: authKeys.me });
+
         toast.dismiss(loadingToast);
         toast.success(`Welcome back, ${userData.name || "User"}!`);
         setTimeout(() => {
           navigate({ to: "/", replace: true });
-        }, 500);
+        }, 100); // Reduced from 500ms to 100ms for faster response
       } catch (userError) {
         console.error("Failed to fetch user after login:", userError);
         await queryClient.invalidateQueries({
@@ -59,7 +63,7 @@ export default function LoginForm() {
         toast.success("Login successful!");
         setTimeout(() => {
           navigate({ to: "/", replace: true });
-        }, 500);
+        }, 100); // Reduced from 500ms to 100ms for faster response
       }
     } catch (error: unknown) {
       console.error("Login error:", error);

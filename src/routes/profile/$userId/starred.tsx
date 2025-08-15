@@ -11,16 +11,14 @@ function UserArticlesComponent() {
   const { userId } = Route.useParams();
   const { data: currentUser } = useCurrentUser();
   const { data: profileUser } = useGetUserProfile(userId);
-  
+
   const isOwnProfile = currentUser?._id === profileUser?._id;
-  
+
   return (
-    <div className="flex items-center justify-center">
-      <StarredArticlesList 
-        userId={userId} 
-        isOwnProfile={isOwnProfile}
-        userName={profileUser?.name}
-      />
-    </div>
+    <StarredArticlesList
+      userId={userId}
+      isOwnProfile={isOwnProfile}
+      userName={profileUser?.name}
+    />
   );
 }

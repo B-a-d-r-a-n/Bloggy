@@ -14,10 +14,19 @@ export const queryClient = new QueryClient({
     },
   },
 });
-const token = localStorage.getItem("access_token");
-if (token) {
-  api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-}
+
+// Function to synchronize API headers with localStorage
+export const syncAuthHeaders = () => {
+  const token = localStorage.getItem("access_token");
+  if (token) {
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  } else {
+    delete api.defaults.headers.common["Authorization"];
+  }
+};
+
+// Initialize auth headers on app startup
+syncAuthHeaders();
 
 const router = createRouter({
   routeTree,
