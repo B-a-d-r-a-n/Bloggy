@@ -74,7 +74,7 @@ export const useCurrentUser = () => {
         throw axiosError;
       }
     },
-    staleTime: 0, // Reduced from 1 minute to 0 for immediate updates
+    staleTime: 5 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
     refetchOnMount: true,
     refetchOnWindowFocus: true,

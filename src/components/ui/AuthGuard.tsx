@@ -5,13 +5,11 @@ import { useCurrentUser } from "../../features/auth/queries";
 interface AuthGuardProps {
   children: ReactNode;
   requireAuth?: boolean;
-  redirectTo?: string;
 }
 
 export default function AuthGuard({
   children,
   requireAuth = false,
-  redirectTo = "/login",
 }: AuthGuardProps) {
   const { isInitializing } = useAuthInitialization();
   const { data: user, isLoading } = useCurrentUser();
